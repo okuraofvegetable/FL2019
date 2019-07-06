@@ -1,0 +1,84 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:36:41 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Fri Jun 21 15:10:57 2019
+# Process ID: 15953
+# Current directory: /home/tansei/UTokyo/Funclogic/week8/problem5
+# Command line: vivado
+# Log file: /home/tansei/UTokyo/Funclogic/week8/problem5/vivado.log
+# Journal file: /home/tansei/UTokyo/Funclogic/week8/problem5/vivado.jou
+#-----------------------------------------------------------
+Sourcing tcl script '/home/tansei/.Xilinx/Vivado/Vivado_init.tcl'
+start_gui
+open_project /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.xpr
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/opt/Xilinx/Vivado/2018.3/data/ip'.
+open_project: Time (s): cpu = 00:00:12 ; elapsed = 00:00:05 . Memory (MB): peak = 6398.066 ; gain = 94.602 ; free physical = 7845 ; free virtual = 28743
+update_module_reference design_1_uart_loopback_0_0
+INFO: [IP_Flow 19-5107] Inferred bus interface 'rstn' of definition 'xilinx.com:signal:reset:1.0' (from Xilinx Repository).
+INFO: [IP_Flow 19-5107] Inferred bus interface 'clk' of definition 'xilinx.com:signal:clock:1.0' (from Xilinx Repository).
+INFO: [IP_Flow 19-4728] Bus Interface 'rstn': Added interface parameter 'POLARITY' with value 'ACTIVE_LOW'.
+INFO: [IP_Flow 19-4728] Bus Interface 'clk': Added interface parameter 'ASSOCIATED_RESET' with value 'rstn'.
+WARNING: [IP_Flow 19-3153] Bus Interface 'clk': ASSOCIATED_BUSIF bus parameter is missing.
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+Adding cell -- xilinx.com:ip:clk_wiz:6.0 - clk_wiz_0
+Adding cell -- xilinx.com:ip:proc_sys_reset:5.0 - proc_sys_reset_0
+Adding cell -- xilinx.com:module_ref:uart_loopback:1.0 - uart_loopback_0
+Successfully read diagram <design_1> from BD file </home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd>
+Upgrading '/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd'
+INFO: [IP_Flow 19-1972] Upgraded design_1_uart_loopback_0_0 from uart_loopback_v1_0 1.0 to uart_loopback_v1_0 1.0
+Wrote  : </home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd> 
+update_module_reference: Time (s): cpu = 00:00:12 ; elapsed = 00:00:05 . Memory (MB): peak = 6540.371 ; gain = 68.340 ; free physical = 7774 ; free virtual = 28672
+update_compile_order -fileset sources_1
+open_bd_design {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd}
+startgroup
+endgroup
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 4
+WARNING: [BD 41-927] Following properties on pin /uart_loopback_0/clk have been updated from connected ip. They may not be synchronized with cell properties. You can set property on pin directly to confirm the value and resolve the warning.
+	CLK_DOMAIN=/clk_wiz_0_clk_out1 
+Wrote  : </home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd> 
+VHDL Output written to : /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/synth/design_1.v
+VHDL Output written to : /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/sim/design_1.v
+VHDL Output written to : /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/hdl/design_1_wrapper.v
+INFO: [BD 41-1029] Generation completed for the IP Integrator block uart_loopback_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block clk_wiz_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block proc_sys_reset_0 .
+Exporting to file /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/hw_handoff/design_1.hwh
+Generated Block Design Tcl file /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/hw_handoff/design_1_bd.tcl
+Generated Hardware Definition File /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/synth/design_1.hwdef
+[Fri Jun 21 15:12:30 2019] Launched synth_1...
+Run output will be captured here: /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/synth_1/runme.log
+[Fri Jun 21 15:12:30 2019] Launched impl_1...
+Run output will be captured here: /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/impl_1/runme.log
+open_hw
+connect_hw_server
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-2222] Launching hw_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+****** Xilinx hw_server v2018.3
+  **** Build date : Dec  6 2018-23:53:53
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+
+open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210319788195A
+set_property PROGRAM.FILE {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/impl_1/design_1_wrapper.bit} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices xc7a35t_0] 0]
+INFO: [Labtools 27-1434] Device xc7a35t (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it.
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/impl_1/design_1_wrapper.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+INFO: [Labtools 27-3164] End of startup status: HIGH
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+INFO: [Labtools 27-1434] Device xc7a35t (JTAG device index = 0) is programmed with a design that has no supported debug core(s) in it.
+exit
+INFO: [Common 17-206] Exiting Vivado at Fri Jun 21 15:17:03 2019...

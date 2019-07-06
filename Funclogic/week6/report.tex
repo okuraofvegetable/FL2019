@@ -1,0 +1,133 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題5}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# fun x -> x+y;;
+- = <fun>
+# (fun x -> x+5) 3;;       
+- = 8
+# (let y=5 in fun x -> x+y) 3;;
+- = 8
+\end{lstlisting}
+\subsection*{考察}
+講義スライドに従って関数のクロージャを作成し、引数を呼び出し時の環境で評価し、それで拡張した呼び出し時の環境のもとで式の部分を評価した。
+\section*{問2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let rec f n = if n = 1 then 1 else n + f (n-1);;
+val f = <rec fun>
+# f 10;;
+- = 55
+# f 15;;
+- = 120
+\end{lstlisting}
+\subsection*{考察}
+講義スライドの1つ目で扱った評価時に工夫する方針で実装した。クロージャを通常の関数とは別のVRecFunという名前でつくり(構成はVFunと同じ)、式部分の評価時に引数だけでなく自分自身でも拡張した環境を用いるようにした。
+\section*{問3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let rec odd n = if n = 1 then true else if n = 0 then false else even (n-1)
+and even n = if n = 0 then true else if n = 1 then false else odd (n-1);;
+rec functions = <fun>
+# odd 15;;
+- = true
+# odd 20;;
+- = false
+# even 131;;
+- = false
+# even 2000;;
+- = true
+\end{lstlisting}
+\subsection*{考察}
+問3の講義スライドの方法1で実装した。方針としては問2で1つの再帰関数を実装したときのものを拡張したけで、n個の相互再帰する関数をまとめて扱って、評価時に自分自身を全て環境に追加してやっているだけである。Parserを書き換えた結果、問2での1つの再帰関数定義let rec...はlet rec ... and ... and ...のandが一つも続かないものの一つとして相互再帰の構文の一つとして扱われている。
+\section*{問4}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let rec f n = if n = 0 then 0 else n + f (n-1);;
+rec val f = <fun>
+# f 10;;
+- = 55
+# f 20;;
+- = 210
+\end{lstlisting}
+\subsection*{考察}
+講義スライドの方法2で実装した。追加した関数のクロージャの環境がその関数が定義され拡張されたあとの環境自身を指すようになっているおかげで、再帰的に評価できる。はじめ実装した時スタックオーバーフローを起こしていたが、それは環境をdumpするデバッグ関数の仕業だった(このミスのおかげで環境が再帰的になっている様子が理解できた。)
+\section*{発展1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# (fun x y z -> x*y*z) 2 3 4;;
+- = 24
+# fun x y -> x+y;;
+- = <fun>
+# let f x y = x+y in f 2 3;;
+- = 5
+# f 2 3;;
+Fatal error: exception Eval.EvalErr
+--------------------------------------
+# let f x y = x*y;;
+val f = <fun>
+\end{lstlisting}
+\subsection*{考察}
+Parserに(1つ以上のvar) ARROW exprを表すvar\_arrow\_exprなどを追加し、$\texttt{fun x y z -> e}$ならば$\texttt{fun x -> fun y -> fun z -> e}$と解釈されるように変更した。$\texttt{let f x y = e,let f x y = e in e'}$の形も同様の方法でサポートした。
+\section*{発展2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let rec f n = if n = 0 then 0 else n + f(n-1);;
+val f = <fun>
+# f 10;;
+- = 55
+# f 20;;
+- = 210
+\end{lstlisting}
+\subsection*{考察}
+値の再帰的定義によって定義できるデータを観察すると、無限にループする構造を定義できていることがわかる。ここで問4で用いたスライドの方法2を思い出すと、この方法で参照を用いて環境をループさせていたことに着目し、この構造を値の再帰的定義を用いて実現できた。評価時の環境を関数fで拡張した環境と、そのfのクロージャ内の関数が一致すればよいので、評価時の環境をenv,fで拡張後の環境をenv'とすると$\texttt{env' = (VFun f n env')::env}$とすればよいことがわかる。
+\section*{発展3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let a = 10;;
+val a = 10
+# let f = dfun x -> x+a;;
+val f = <dfun>
+# f 10;;
+- = 20
+# let a = 20;;
+val a = 20
+# f 10;;
+- = 30
+# let fact = dfun n -> if n = 1 then 1 else n*fact (n-1);;
+val fact = <dfun>
+# fact 10;;
+- = 3628800
+# fact 5;;
+- = 120
+\end{lstlisting}
+\subsection*{考察}
+動的束縛の関数定義は、クロージャに環境を含めずすべて評価時の環境で評価してやることで実現できる。動的束縛の関数では評価時の環境を用いるので、ARROW以降の式の部分を評価する際の環境に定義した関数が入っており、自然に再帰関数を定義できる。
+\end{document}

@@ -1,0 +1,197 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題1}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# sum_to 10;;
+- : int = 55
+# gcd 6 15;;
+- : int = 3
+# gcd 39 91;;
+- : int = 13
+# is_prime 1;;
+- : bool = false
+# is_prime 2;;
+- : bool = true
+# is_prime 6;;
+- : bool = false
+# is_prime 1000000007;;
+- : bool = true
+ \end{lstlisting}
+
+\section*{問2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# twice (fun x -> x*x) 3;;
+- : int = 81
+# repeat (fun x -> x*x) 3 2;;
+- : int = 256
+ \end{lstlisting}
+
+\section*{問3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# sum_to 10;;
+- : int = 55
+# is_prime 57;;
+- : bool = false
+# is_prime 59;;
+- : bool = true
+# is_prime 1000000007;;
+- : bool = true
+# gcd 4826731 2134197;;
+- : int = 377
+\end{lstlisting}
+\subsection*{考察}
+$\texttt{sum\_to}$を例にとって説明する。
+sum\_toの定義はsum\_to n = if n=0 then 0 else n + f (n-1)である。これに関数の引数を加えたsum\_to\_sub f n = if n=0 then 0 else n + f (n-1)
+を考える(sum\_to\_subは再帰関数でないことに注意)。再帰関数をこのように変形したものともとの再帰関数に与える引数をfixに渡すと求めたい値が求まることを確認する。fix sum\_to\_sub 3 = sum\_to\_sub (fix sum\_to\_sub) 3 = 3 + (fix sum\_to\_sub) 2、
+fix sum\_to\_sub 2 = sum\_to\_sub (fix sum\_to\_sub) 2 = 2 + (fix sum\_to\_sub) 1、...というように展開されて3+2+1+0が求まる。sum\_to以外もどうようにして実装できる。
+
+\section*{問4}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# fold_right (fun x l -> x::l) ！[1;2;3;4;5] [] ;;
+- : int list = [1; 2; 3; 4; 5]
+# fold_left (fun l x -> x::l) [] [1;2;3;4;5]  ;;
+- : int list = [5; 4; 3; 2; 1]
+# fold_right (fun x y -> 10*y+x) [1;2;3;4;5] 0 ;;
+- : int = 54321
+# fold_left (fun x y -> 10*x+y) 0 [1;2;3;4;5] ;;
+- : int = 12345
+ \end{lstlisting}
+\subsection*{考察}
+$\texttt{fold\_right}$の定義より、$\texttt{fold\_right f }[x_1;x_2;...x_n] \ e =  \texttt{f x}_1 \ (\texttt{fold\_right f }[x_2;...x_n] \ e)$であるからこれを用いて実装した。同様に$\texttt{fold\_left}$の定義より$\texttt{fold\_left f }e \ [x_1;x_2;...x_n] =  \texttt{fold\_left f }(\texttt{f}\ e\ x_1)\ [x_2;...x_n]$である。これを用いて実装すると呼び出しが自分自身そのままであるから問題の指示どおり末尾再帰になっている。
+\section*{問5}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# append [1;2;3;4] [5;6;7];;
+- : int list = [1; 2; 3; 4; 5; 6; 7]
+# filter is_prime [1;2;3;4;5;6;7;8;9;10;11;12;13];; 
+(* is_prime defined in problem 1 *)
+- : int list = [2; 3; 5; 7; 11; 13]
+ \end{lstlisting}
+\subsection*{考察}
+appendの第1,2引数をそれぞれp,qとすると、appendの定義よりp=[]のときappend p q = q、p=x::xsのときappend p q = x::(append xs q)なのでこれを用いて実装した。
+filterの第1引数の関数をf,第2引数のリストをlとする。filterの定義より、l=[]のときfilter f l = []、l=x::xsのときf x = trueならばx::(filter f xs)、falseならfilter f xsなのでこれを用いて実装した。
+
+\section*{問6}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# append_via_fold_right [1;2;3;4] [5;6;7];;
+- : int list = [1; 2; 3; 4; 5; 6; 7]
+# filter_via_fold_right is_prime [1;2;3;4;5;6;7;8;9;10;11;12;13];;
+(* is_prime defined in problem 1 *)
+- : int list = [2; 3; 5; 7; 11; 13]
+# append_via_fold_left_fast [1;2;3;4] [5;6;7];;
+- : int list = [1; 2; 3; 4; 5; 6; 7]
+# filter_via_fold_left_fast is_prime [1;2;3;4;5;6;7;8;9;10;11;12;13];;
+(* is_prime defined in problem 1 *)
+- : int list = [2; 3; 5; 7; 11; 13]
+ \end{lstlisting}
+\subsection*{考察}
+はじめに$\texttt{fold\_right}$を用いた実装について考察する。
+まずappendについて、listは定義より後ろに要素を足すのはリストの長さの線形時間かかってしまうので先頭に要素を追加することを考えると、第二引数のlistを初期値として第一引数のlistの要素を最後尾から順に先頭に追加していけばよい。これには$\texttt{fold\_right}$の形式が適する。次にfilterであるがappendの時と同様の理由で、空listから始めてlistの最後尾から順に条件を満たせば追加することを繰り返すことにすると、要素とlistを受け取って要素が条件を満たすならば先頭に要素を追加したlistを、そうでなければそのままのリストを返す関数を用意すれば$\texttt{fold\_right}$の形式に適する。
+\par
+$\texttt{fold\_left}$を用いた実装については、直接的に考えるのは難しそうだったので発展2の$\texttt{fold\_right}$を$\texttt{fold\_left}$で表した結果を用いて置換した。$\texttt{(****\_via\_fold\_left\_fast})$
+発展2が解ける前はリストの最後尾に要素をリストの長さの線形時間かけて挿入する関数を用いてリスト長の2乗で動くのを実装した$\texttt{(****\_via\_fold\_left\_slow)}$が、fastは線形時間で動作する。
+\par
+問5と比較して、書きやすさは今回の課題をやった際は問5のほうが書きやすく感じたが、foldに慣れれば問5のように漸化式を立てることなく、rirghtやleftと形があってるか見るだけで書けるものが多いので楽なことが多くなるように感じる。
+\par
+速度を比較するためにbenchmark.mlで実装した関数を用いて時間を計測した。$\texttt{append,append\_via\_fold\_right,append\_via\_fold\_left\_fast}$のいずれも線形オーダーなので$10^5$程度の長さのリストを2つappendする際に実行時間に大きな差異はなかったが、$\texttt{append\_via\_fold\_left\_fast}$以外の2つは末尾再帰でないので配列サイズを$10^7$程度にするとスタックオーバーフローした。$\texttt{append\_via\_fold\_left\_slow}$は前述の通り2乗のオーダーなので$10^5$で1分以上終了しなかった。
+\section*{問7}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# perm [1;2;3];;
+- : int list list =
+[[1; 2; 3]; [1; 3; 2]; [2; 1; 3]; [2; 3; 1]; [3; 1; 2]; [3; 2; 1]]
+# perm [2;3;5;7];;
+- : int list list =
+[[2; 3; 5; 7]; [2; 3; 7; 5]; [2; 5; 3; 7]; [2; 5; 7; 3]; [2; 7; 3; 5];
+ [2; 7; 5; 3]; [3; 2; 5; 7]; [3; 2; 7; 5]; [3; 5; 2; 7]; [3; 5; 7; 2];
+ [3; 7; 2; 5]; [3; 7; 5; 2]; [5; 2; 3; 7]; [5; 2; 7; 3]; [5; 3; 2; 7];
+ [5; 3; 7; 2]; [5; 7; 2; 3]; [5; 7; 3; 2]; [7; 2; 3; 5]; [7; 2; 5; 3];
+ [7; 3; 2; 5]; [7; 3; 5; 2]; [7; 5; 2; 3]; [7; 5; 3; 2]]
+ \end{lstlisting}
+\subsection*{考察}
+permの結果のリスト内の各リストを先頭要素ごとに分類し、それらの先頭要素を取り除いたものはpermの引数のリストからその要素を取り除いたリストをpermに渡した結果なので、引数のリストの各要素を選び、それ以外の要素からなるリストに対してのpermの結果の各リストの先頭に選んだ要素を追加し(これをmapでやった)、それをすべて@でつなげたものを返せばよい(つないでいる途中のものをアキュムレータに入れつつ再帰で実装した)
+\section*{発展1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# reverse_via_fold_left [1;2;3;4;5];;
+- : int list = [5; 4; 3; 2; 1]
+# reverse_via_fold_right [1;2;3;4;5];;
+- : int list = [5; 4; 3; 2; 1]
+ \end{lstlisting}
+\subsection*{考察}
+reverse $[x_1; x_2; ...;x_n]$ = $x_n$::(reverse $[x_1; x_2; ...;x_{n-1}]$)なのでこれは$\texttt{fold\_left}$の形式に適する。$\texttt{fold\_right}$を用いて書く方法は問6と同様に発展2の結果と$\texttt{fold\_left}$で書いた結果を用いて書いた。
+\section*{発展2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# fold_right_via_fold_left (fun x l -> x::l) [1;2;3;4;5] [] ;;
+- : int list = [1; 2; 3; 4; 5]
+# fold_left_via_fold_right (fun l x -> x::l) [] [1;2;3;4;5]  ;;
+- : int list = [5; 4; 3; 2; 1]
+# fold_right_via_fold_left (fun x y -> 10*y+x) [1;2;3;4;5] 0 ;;
+- : int = 54321
+# fold_left_via_fold_right (fun x y -> 10*x+y) 0 [1;2;3;4;5] ;;
+- : int = 12345
+ \end{lstlisting}
+\subsection*{考察}
+まず$\texttt{fold\_right}$を$\texttt{fold\_left}$で表す方法について考察する。右畳み込み$\texttt{fold\_right\ f\ l\ e}$と左畳み込み$\texttt{fold\_left\ f\ e\ l}$の対称性と発展1でやったようにreverseが$\texttt{fold\_left}$で簡単にかけることに着目する。fでlを右畳み込みしたものはlをreverseしたものをfの引数をひっくり返した関数(すなわち$\texttt{fun x y -> (f y x))}$で左畳み込みしたものと同じであり、reverseも左畳み込みも$\texttt{fold\_left}$のみでかけるので$\texttt{fold\_right}$が$\texttt{fold\_left}$で書ける。\par
+次に$\texttt{fold\_left}$を$\texttt{fold\_right}$で書く方を考察する。
+パズルのように直接的に表そうとしたが難しかったので$\texttt{fold\_right\ g\ l\ [何か]}$が、初期値$\texttt{e}$を受け取って$\texttt{f,l}$での右畳み込みの結果$\texttt{fold\_left\ f\ e\ l}$を返すような関数、を返すように$\texttt{g}$($\texttt{f}$に依存)を定めることを考えてみる。$\texttt{g}$がそのようなものであると仮定する。\texttt{l=x::xs}とするとgが満たすべき式は$\texttt{(fold\_right\ g\ l\ [何か])\ e}\ =\ \texttt{(fold\_right\ g\ xs\ [何か])\ (f\ e\ x)}$である。簡単のために$\texttt{h}\ =\ \texttt{(fold\_right\ g\ xs\ [何か])}$と置こう。$\texttt{g}$は$\texttt{x}$と関数$\texttt{h}$($\texttt{xs}$の$\texttt{g}$での右畳み込み結果)を受け取って、関数$\texttt{e}\mapsto\texttt{h\ (f\ e\ x)}$を返す関数であるから$\texttt{G\ =\ fun\ f\ x\ h\ ->\ (fun\ e\ ->\ h\ (f\ e\ x))}$,$\texttt{g\ =\ G f}$とすればよいことがわかる。残るは[何か]としていた初期値であるが、リストが空のときは初期値をそのまま返せば良いので$\texttt{id}$とすればよい。以上で$\texttt{fold\_left}$を$\texttt{fold\_right}$で表せた。
+\section*{発展3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# eight = add {t=(fun f x -> f (f (f (f (f x)))))} 
+  {t=(fun f x -> f (f (f x)))};;
+val eight : church = {t = <fun>}
+# eight.t (fun x -> x+1) 0;;
+- : int = 8
+# eight.t (fun x -> x+.1.0) 0.0;;
+- : float = 8.
+# (mul {t=(fun f x -> f (f (f (f (f x)))))} 
+{t=(fun f x -> f (f (f x)))}).t (fun y -> y+1) 0;;
+- : int = 15
+# (sub {t=(fun f x -> f (f (f (f (f x)))))} 
+{t=(fun f x -> f (f (f x)))}).t (fun y -> y+1) 0;;
+- : int = 2
+ \end{lstlisting}
+\subsection*{考察}
+まずadvanced3.mlの実装をしたが型に\_がついてがおかしくて一度使用したら型が変わっていたり、エラーが出て諦めていたが、第二回の授業スライドでそれが未決定な単相型で、引数に多相関数を渡したいときはレコードを用いるとよいとあったのでそれを用いてadvanced3-type-church.mlを書いた。まずは型を考慮せずにどのような方針でadd,mul,subを実装したかについて説明する。
+\subsubsection*{型のことは考えずに}
+$f^{n+m}(x)=f^n(f^m(x))$,$f^{nm}(x)=(f^m)^n(x)$であるから、add,mulは \par それぞれ$$\texttt{fun\ n\ m\ ->\ (fun\ f\ x\ ->\ n\ f\ (m\ f\ x))}$$ $$\texttt{fun\ n\ m\ ->\ (fun\ f\ x\ ->\ n\ (m\ f)\ x)}$$のような感じで実装できる。addが実装できるので1増やす関数succも同様に実装できる。
+$\underline{n}$をもらって1つ前の$\underline{max(0,n-1)}$を返す関数predが実装できればsubは、$\texttt{let\ sub\ =\ fun\ n\ m\ ->\ m\ pred\ n}$として実装できるのでpredの実装を考える。$\texttt{next\_pair (n,m) -> (succ n,n)}$という関数を考えると$n\ next\_pair\ (zero,zero)\ =\ (n,n-1)$なのでpredは$\texttt{fun n -> snd (n next\_pair ((fun f x -> x),(fun f x -> x)))}$のように実装できる。
+\subsubsection*{型がどうまずくなったか}
+上記のように実装するとはじめに述べた通り、addやmulの戻り値は多相関数ではなくて$\texttt{('\_a\ ->\ '\_a)\ ->\ '\_a\ ->\ '\_a}$のように未決定の単相型になってしまうので型が一度決まると変更できなくなる(問題の趣旨は多相関数を返すこと)。
+\subsubsection*{レコードで回避}
+第二回授業スライドの通り$\texttt{type\ church\ =\ {t\ :\ 'a.\ ('a\ ->\ 'a)\ ->\ 'a\ ->\ 'a\ }}$で定義されるchurchを用いることで引数に多相関数を渡すことができる。このchurch型を用いて書き直したのがadvanced3-type-church.mlである。ここではadd,mul,subの型はすべて$\texttt{church\ ->\ church\ ->\ church}$である。これで型がついたが、問題のadd,mul,subの要件は関数をもらって返す関数であるから入力の際に関数をchurch型へ、出力の際にchurch型から多相関数へ変換してやる必要がある。
+\subsubsection*{型の変換}
+これはchurch型の引数に対して.tをとればいいだけだと思っていたが、$\texttt{let\ ctof\ =\ fun\ c\ ->\ c.t}$として$\texttt{ctof\ zero}$などを表示してみると型は$\texttt{('\_a\ ->\ '\_a)\ ->\ '\_a\ ->\ '\_a}$になってしまう。これの原因を探してみると、第2回の授業スライド内のValue Restrictionによるもののようで、関数適用は値でない式なので多相的な型が与えられない。実際スライドにあるように$\texttt{(fun\ f\ x\ ->\ zero.t\ f\ x)}$は多相関数になった。しかし様々なchurch型の値を変換する際には関数適用を避ける方法がわからずどのようにしても未決定な単相型の関数を返すようにしかできなかった。動作例にはchurch型のままのものが正しく動き、多相関数になっていることを示す例を載せた。
+\end{document}

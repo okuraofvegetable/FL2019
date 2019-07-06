@@ -1,0 +1,168 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題5}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+$ ocamllex lexer.mll 
+30 states, 1692 transitions, table size 6948 bytes
+$ ocamlyacc -v parser.mly 
+$ ocamlc -c syntax.ml 
+$ ocamlc -c parser.mli
+$ ocamlc -c lexer.ml
+$ ocamlc -c parser.ml
+$ ocamlc -c example.ml
+$ ocamlc -o example syntax.cmo lexer.cmo parser.cmo example.cmo
+\end{lstlisting}
+\subsection*{考察}
+parser.outputにはLR構文解析のオートマトンの各状態の情報などが書かれていた。
+arith\_exprをexprに潰すとshift/reduce conflictが発生した。
+\section*{問2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# 5*3;;
+- = 15
+# 5*3+4;;
+- = 19
+# (5+3)*(2+7);;
+- = 72
+# (5+3)*(2+7)/(2*3);;
+- = 12
+# (4-2)*(5+3)*(2+7)/(2*3);;
+\end{lstlisting}
+\subsection*{考察}
+加減算と剰余算の優先順位を括弧なしで実現するためにarith\_exprとfactor\_exprにわけた。evalはEAddとほぼ同様である。ただしEDivで割る数が0のときはDivisionByZero例外を吐くようにした。
+\section*{問3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let a = 5;;
+val a = 5
+# let b = 100 in a+b;;
+- = 105
+# b;;
+Fatal error: exception Eval.EvalErr
+\end{lstlisting}
+\subsection*{考察}
+ELetはもとの環境での式の評価結果を一時的定義の変数に束縛し、その変数で拡張した環境のなかでin以降の式を評価してその評価結果と、拡張前の環境を返せば良い。
+トップレベルの変数定義では、もとの環境で式を評価して、その評価結果を束縛して環境を拡張し、それを返せばよい。
+\section*{問4}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# (5+3=8)&&(2+9=10);;
+- = false
+# (5+3=8)&&(2+9=11);;
+- = true
+# (5+3=8)^(2+9=11);;
+- = false
+# (5+3=8)^(2+9=10);;
+- = true
+# (5+3=9)||(2+9=10);;
+- = false
+# false||true;;
+- = true
+# 5+3=8 && true;;
+Fatal error: exception Parsing.Parse_error
+-------------------------------------------------
+# (5+3=8) && true;;
+- = true
+# ((5+3=8)&&(2*3=6))&&(2+4=3*2);;
+- = true
+# 5 && true;;
+Fatal error: exception Eval.EvalErr
+\end{lstlisting}
+\subsection*{考察}
+C言語のように優先度を= \verb|<| \&\& \verb|<| \verb+||+にすることも考えたが、 and(\&\&),or(\verb+||+),xor(\verb|^|)は=,\verb|<|と同等のレベルの演算子とし、3つ以上結合するには必ず括弧をつけなければならないような言語仕様にした。
+ブール演算に対応するにあたって整数値の比較のみだった=をブール値の比較もできるように拡張した。
+\section*{発展1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# +++;;
+Parsing.Parse_error
+# ?     
+Failure Unknown Token: ?
+# $
+Failure Unknown Token: $
+# 5/0;;
+DivisionByZero
+# yyy;;
+Eval.EvalErr
+Unbound value yyy
+\end{lstlisting}
+\subsection*{考察}
+課題4からmain.mlとeval.mlを改良した。EvalErr例外にstringをつけてより詳細なエラー情報をもたせた。そしてmain.mlのread\_eval\_print内でtry with文でlexer,Parser,評価器内の例外を補足して、例外を補足した場合は例外の情報を表示してから例外発生前の環境のままプロンプトを表示して次のコマンドを引き続き要求するようにした。
+\section*{発展2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let x = 10            
+let y = x+1
+let z = x*y;;
+val x = 10
+val y = 11
+val z = 110
+# let a = 5
+let b = 3
+let c = b+a;; 
+val a = 5
+val b = 3
+val c = 8
+\end{lstlisting}
+\subsection*{考察}
+let宣言の列はlet宣言のリストとして$\texttt{CDecls\ of\ (name\ *\ expr)\ list}$とした。これに伴ってparser.mlyのlet式の文法を変更した。parser.mlyのletsは0個以上のlet文を表している。コマンドの実行に関しては上のlet文から順に宣言して環境を拡張していくだけであるから、再帰で簡単にできる。次に、宣言後の表示について説明する。ここまでインタプリタの出力はmain.ml内で行われており、それ以外のところで表示するのはよろしくないと考えたので、main.ml内からのみ出力されるようにした。実際にはmain.mlに変更を加えておらず、Printf.printfに与える文字列と値(idとv)を工夫した。上の動作例でのx,y,zのlet式ならば,idを"val x = 10\verb|\|nval y = 11\verb|\|nval z",vを110となるようにeval\_command\_envを書いている。
+\section*{発展3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let x = 10;;
+val x = 10
+# let x = 50
+  and y = x*2;;
+val x = 50
+val y = 20
+# let x = 10;;
+val x = 10
+# let x = 50
+  and y = x*2
+  in x+y;; 
+- = 70
+# let a = 50
+  and b = 20
+  and c = a+b;;
+Fatal error: exception Eval.EvalErr
+----------------------------------------
+# let a = 50
+  and b = 20 
+  and c = 40
+  in a+b+c;;
+- = 110
+# a;;
+Fatal error: exception Eval.EvalErr
+\end{lstlisting}
+\subsection*{考察}
+発展2を少し変更して実装した。発展2ではトップレベル定義(CDecls)の評価の際に変数が定義されるごとに環境が拡張され、その環境で次の変数の式を評価していったが、今回は同時に定義されるのでその部分を全ての変数についてもとの環境で評価するように変更してやればよい。全ての変数をもとの環境で評価してから、環境を拡張して返す。\par
+局所定義についても同様で、全ての変数をもとの環境で評価して、それらで拡張した環境でin以降の式を評価してやればよい。定義された変数の情報の表示についても発展2と同様である。
+syntax.mlを見ればわかるが、単なるlet式はlet...and...のand以降が一つもないものとみなされている。
+\end{document}

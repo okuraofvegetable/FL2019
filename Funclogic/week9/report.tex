@@ -1,0 +1,278 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題9}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# (1,2);;
+for all 
+ ( int,  int)
+- = (1,2)
+# (fun x -> x,fun x -> x+1);;
+for all a1 
+ ( ( a1 ->  a1 ),  ( int->  int))
+- = (<fun>,<fun>)
+-----------------------------------------------
+# fun x -> fun y -> match (x,y) with
+                    | p -> (fun p -> match p with | (x,y) -> x) p;;
+for all a6 a5 
+ ( a5 ->  ( a6 ->  a5 ))
+-----------------------------------------------
+# fun x -> fun y -> fun z -> match ((x,y),z) with   
+  | tup -> (fun p -> match p with | (x,y) -> x) tup;;
+for all a2 a7 a1 
+ ( a1 ->  ( a2 ->  ( a7 ->  ( a1 ,  a2 ))))
+- = <fun>
+-----------------------------------------------
+# [];;
+for all a3 
+ a3  list
+- = []
+# 1::[];;
+for all 
+ int list
+- = (1::[])
+# (1,true);;
+for all 
+ ( int,  bool )
+- = (1,true)
+# 2::1::[];;
+for all 
+ int list
+- = (2::(1::[]))
+\end{lstlisting}
+\subsection*{考察}
+eval\_exprでEPair(x,y)ならばx,yを評価して(x,y)を返し、ECons(x,y)ならばx,yを評価して、x::yを返した。
+\section*{問2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# match (1,2) with 
+  | (a,b) -> a+b;;
+for all 
+ int
+- = 3
+# let f = fun x -> fun y ->    
+    match (x,y) with
+    | (1,a) -> a   
+    | (b,c) -> b*c;;
+for all 
+ ( int->  ( int->  int))
+val f = <fun>
+# f 1 5;;
+for all 
+ int
+- = 5
+# f 2 5;;
+for all 
+ int
+- = 10
+# f 2 3;;
+for all 
+ int
+- = 6
+# let rec f xl = 
+    match xl with 
+    | [] -> 0 
+    | x::xs -> x+(f xs);;
+for all 
+ ( int list->  int)
+val f = <rec fun>
+# f (1::2::3::[]);;
+for all 
+ int
+- = 6
+\end{lstlisting}
+\subsection*{考察}
+例題で作成したfind\_matchはvalueがpatternにマッチしないときPatternMatchErrorという例外を投げるようにつくった。パターンを1つめから順にPatternMatchErrorをtry-with文で補足しながら試していき、初めてマッチしたときのパターンに対する割り当てで環境を拡張し、その元でパターンに対応する式を評価した。
+\section*{問3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# 1::true::[];;
+Fatal error: exception TySyntax.TyError
+------------------------------------------
+# (1,true);;
+for all 
+ ( int,  bool )
+- = (1,true)
+# (fun x->x,fun x->x);;
+for all a2 a1 
+ ( ( a1 ->  a1 ),  ( a2 ->  a2 ))
+- = (<fun>,<fun>)
+# match fun x->x with
+  | f -> (f 1,f true);;
+Fatal error: exception TySyntax.TyError
+\end{lstlisting}
+\subsection*{考察}
+スライドの方針を参考に実装した。(問1,2の動作例の出力も問3まで実装したあとのものなので型推論が行われているのでそちらも参照していただければと思います。)
+用意した補助関数の一部を説明する。
+$\texttt{match e with p1 -> e1 | ... | pn -> en}$の各pに対して型,制約、追加される型環境$(t,c,\Gamma)$を求めているのがtcgamma,$\Gamma_i$を元の型環境に加えて$e_i$を評価するのがadd\_g\_infer、型tと型のリスト$t_1,t_2,t_3,...$を受け取って$t=t_1=t_2=t_3...$の制約を生成するのがmake\_consである。\par
+スライドの方針では最後の動作例のようにmatch-withの間のものが多相関数にならない。この動作は本家Ocamlインタプリタと異なり気になったので発展2にて多相関数へ対応できるように拡張した。
+\section*{問4}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# (fun x -> (x*x*x+x)-(x*x)) (1+2);;              
+for all 
+ int
+EApp (EFun (x,ESub (EAdd (EMul (EMul (x,x),x),x),EMul (x,x))),EAdd (1,2))
+EFun (x,ESub (EAdd (EMul (EMul (x,x),x),x),EMul (x,x)))
+ESub (EAdd (EMul (EMul (x,x),x),x),EMul (x,x))
+EAdd (EMul (EMul (x,x),x),x)
+EMul (EMul (x,x),x)
+EMul (x,x)
+x
+EAdd (1,2)
+1
+2
+x
+EAdd (1,2)
+1
+2
+x
+EAdd (1,2)
+1
+2
+x
+EAdd (1,2)
+1
+2
+EMul (x,x)
+x
+EAdd (1,2)
+1
+2
+x
+EAdd (1,2)
+1
+2
+- = 21
+----------------------------------------
+# let rec f n = if n = 0 then 0 else n + f ( n - 1);;
+for all 
+ ( int->  int)
+val f = <rec fun>
+# f 10000;;
+( about 10 seconds later... )
+for all 
+ int
+- = 50005000
+\end{lstlisting}
+\subsection*{考察}
+環境を変数とサンクの組に変更し、eval\_expr内でいままで行っていた「環境に値を追加してから評価」という部分を適宜サンクを追加するように置き換えた。
+動作例はeval\_expr内で評価前に引数の式を表示するようにしたもので、動作例を見ると(1+2)が何度も評価されていることがわかる。
+点線の下の例のfは1からnまでの和を求める再帰関数である。
+これの計算量について考える。今までのインタプリタではこれの計算量はO(n)である。
+以下で、名前呼びでのfの計算量が少なくとも$O(n^2)$であることを示す。
+名前呼びであるから、f 3を呼ぶと中でf (3-1)が呼ばれ、f (3-1)の中でf ((3-1)-1)が呼ばれ...とういうように呼ばれる。
+f kではkがelseの部分で評価されるが、kの評価にはn-kに比例する時間がかかる。よって全体では$1+2+3...+n$に比例する時間以上かかるので$O(n^2)$以上かかる。
+よってf 10000を評価するのに10秒もかかる。
+\section*{発展1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# (fun x -> (x*x*x+x)-(x*x)) (1+2);; 
+for all 
+ int
+EApp (EFun (x,ESub (EAdd (EMul (EMul (x,x),x),x),EMul (x,x))),EAdd (1,2))
+EFun (x,ESub (EAdd (EMul (EMul (x,x),x),x),EMul (x,x)))
+ESub (EAdd (EMul (EMul (x,x),x),x),EMul (x,x))
+EAdd (EMul (EMul (x,x),x),x)
+EMul (EMul (x,x),x)
+EMul (x,x)
+x
+EAdd (1,2)
+1
+2
+x
+x
+x
+EMul (x,x)
+x
+x
+- = 21
+---------------------------------------
+# let rec f n = if n = 0 then 0 else n + f ( n - 1);;
+for all 
+ ( int->  int)
+val f = <rec fun>
+# f 10000;;
+for all 
+ int
+- = 50005000 (in a flash)
+\end{lstlisting}
+\subsection*{考察}
+問4でサンクを環境に追加していたところを適宜$\texttt{ref DThunk}$に置き換え、EVarの評価の際にもし参照先がDThunkなら評価して値に変えるようにした。\par
+上の動作例を見ると、1+2の評価は一度しか行われていないことがわかる。
+必要呼びでは値呼びと同様に、名前呼びのときのような不要な再計算がおこらないので動作例のfの計算量はO(n)であり、高速である。
+\section*{発展2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# match fun x ->x with
+  | f -> (f 1,f true);;
+for all 
+ ( int,  bool )
+- = (1,true)
+# match fun x -> fun y -> x+1 with
+  | f -> (f 1 true,f 2 false);;
+for all 
+ ( int,  int)
+- = (2,3)
+# match fun x -> let g = fun y -> x y in g 4 with
+  | f -> (f (fun x -> x+1),f (fun x -> true));;
+for all 
+ ( int,  bool )
+- = (5,true)
+# match (match fun x -> fun y -> fun z -> z with | f -> (f 1,f true)) with
+  | (g,h) -> ((g 2 3),(h true []));;
+for all a23 
+ ( int,  a23  list)
+- = (3,[])
+----------------------------------------------
+# ->
+Error! /* <- color */
+Parsing.Parse_error
+\end{lstlisting}
+\subsection*{考察}
+2つの拡張を行った。
+\subsubsection*{パターンマッチのlet多相への対応}
+パターンマッチの型推論の実装を授業スライドの方針に従ってやると、上の動作例にあるような
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# match fun x ->x with
+  | f -> (f 1,f true);;
+\end{lstlisting}
+という式が型エラーとなるが、本家Ocamlインタプリタではこれは
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let f = fun x ->x in (f 1,f true);;
+\end{lstlisting}
+と同様に多相関数となり型エラーにはならないことを同期に教えてもらったので、本家の仕様に合わせるべく型推論器の拡張を行った。
+まず、授業スライドの方針でなぜ型エラーになるかについて考えた。
+上の例で、パターンのfの型はとりあえず新たな型変数$\alpha$と置かれる。このままunificationが行われるためfが型スキーマに一般化されることがなく多相にならない。なのでlet多相でやったようにどこかしらで一旦unifyし、それで未決定なものをgeneralizeしてやる必要がある。授業スライドではパターンの型全てとmatch-withで挟まれた式の型が等しいという制約と、ARROWの右側の型が全て同じという制約を同時にunifyしているがこれらは独立であることに着目した。なのでパターンの型全てとmatch-withで挟まれた式の型が等しいという制約(leftCとする)をまず集めて、unifyしその結果のsubstで置き換えてもなお未決定な型変数はgeneralizeで型スキーマに一般化する。
+そのもとでARROWの右側の型が全て同じという制約(rightCとする)を集め、unifyすればよい。
+スライドでは追加する型環境(=変数名と型スキーマの組)$\Gamma$を求めていたが、代わりに追加する変数名と型の組$\Gamma$を求めた。
+leftCをunifyし、それをsigmaをとし、あとはlet多相のときと同様に型環境の置き換えやgeneralizeなどを行った。結果的に動作例のようにmatch-with文のlet多相への対応ができた。
+\subsubsection*{エラー処理と表示}
+エラーが起こってもインタプリタが終了しないようにtry-with文を用いてエラーを捕捉するようにした。またErrorをカラーで表示するようにした。
+\end{document}

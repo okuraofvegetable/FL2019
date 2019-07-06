@@ -1,0 +1,170 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題10}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- bloodrelative(iwao,X).
+X = sanae ;
+X = kobo ;
+false.
+
+?- bloodrelative(kobo,X).
+X = kobo ;
+X = miho ;
+X = kobo ;
+X = sanae ;
+X = kobo ;
+X = sanae ;
+X = kobo ;
+X = koji ;
+X = sanae ;
+X = iwao ;
+X = mine ;
+false.
+\end{lstlisting}
+\subsection*{考察}
+はじめは定義通り$\texttt{bloodrelative(X,Y) :- ancestor(X,Z),ancestor(Y,Z).}$とした。実行結果はkobo自身や他の人も何度も出力されるが探索上仕方ないとした。この定義ではkoboとiwaoなどが血縁関係にならないのでX,Yのどちらか一方がもう一方の祖先の場合も血縁関係となるように修正した。動作例は修正後のものである。
+\section*{問2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- mult(s(s(z)),s(s(s(z))),X).
+X = s(s(s(s(s(s(z)))))).
+?- mult(X,s(s(s(z))),s(s(s(z)))).
+X = s(z) ;
+(don't stop)
+--------------------------------
+?- mult(s(z),X,s(s(s(z)))).
+X = s(s(s(z))) ;
+false.
+\end{lstlisting}
+\subsection*{考察}
+定義は,\\
+$\texttt{mult(z,\_,z).}$\\
+$\texttt{mult(s(X),Y,Z) :- mult(X,Y,W),add(Y,W,Z). }$\\である。addは講義スライドのものを用いた。
+第一引数を小さくしていきながら1行目のbaseケースに帰着される。
+なので、第二引数、第三引数に対する問い合わせはbaseケースに到達し、探索が停止する。逆に第一引数に対する問い合わせは停止しなかった。また停止はしなかったがスタックオーバーフローは起こさなかったので探索で無限ループしていると考えられる。
+\section*{問3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- reverse([1,2,3],X).
+X = [3, 2, 1].
+
+?- reverse(X,[1,2,3]).
+X = [3, 2, 1] ;
+(don't stop)
+
+--------------------
+(add length check ver.)
+?- reverse([1,2,3],X).
+X = [3, 2, 1].
+
+?- reverse(X,[1,2,3]).
+X = [3, 2, 1] ;
+false.
+\end{lstlisting}
+\subsection*{考察}
+コンスでは先頭が簡単に取り出せる。reverseの判定をしたいのでリストの最後尾を取り出したくなった。なので
+$$pushback(X,Y,Z)\Leftrightarrow リストXの最後尾にYを挿入したらZ$$
+という述語を定義した。
+reverseの定義は\\
+$reverse([],[]).$\\
+$reverse([A|X],Y) :- reverse(X,Z),pushback(Z,A,Y).$\\
+とした。第一引数のリストは長さが短くなってbaseケースに到達するので第一引数への問い合わせは止まる。しかし第二引数への問い合わせは止まらなかった。
+ここで、一方のリストが与えられれば、もう一方のリストの長さは決定するので探索空間を狭められる(長さの制約のみでは依然として解の候補は無限だが)と思いsamelengthという述語を用いて第二引数との長さのチェックを入れてみたところ、第二引数への問い合わせでも停止するようになった。このことから、Prologでの探索では未決定なものについて仮の値を定めてカンマのつぎの述語のチェックをしてくれていると考えられる。実際、reverse(X,Y)のように両引数について問い合わせをすると、以下のように仮の値と思われる値がインタプリタから出力されることを確認できた。
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- reverse(X,Y).
+X = Y, Y = [] ;
+X = Y, Y = [_3280] ;
+X = [_3280, _3286],
+Y = [_3286, _3280] ;
+X = [_3280, _3298, _3286],
+Y = [_3286, _3298, _3280] ;
+X = [_3280, _3298, _3304, _3286],
+Y = [_3286, _3304, _3298, _3280] ;
+X = [_3280, _3298, _3316, _3304, _3286],
+Y = [_3286, _3304, _3316, _3298, _3280] ;
+.....
+\end{lstlisting}
+
+\section*{問4}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- hamilton([1,2,3,4],[[1,2],[2,3],[3,4],[4,1]]).
+true ;
+true ;
+true ;
+true ;
+false.
+?- hamilton([1,2,3,4],[[1,2],[2,3],[3,4]]).
+true ;
+false.
+?- hamilton([1,2,3,4],[[1,2],[2,3]]).
+false.
+\end{lstlisting}
+\subsection*{考察}
+Vを頂点番号のリストとする。各有向辺$(u,v)\in E$に対して[u,v]のリストをEとする。(動作例参照)
+はじめ、$$permutation(X,P)\Leftrightarrow "PはXの順列"$$と$$ispath(P,E)\Leftrightarrow "Pはパス"$$というpredicateを作ろうと思ったがうまく実装できなかったので諦めた。
+$$choose(X,Y,Z)\Leftrightarrow ZのどこかにYを挿入するとX$$
+$$in(X,Y)\Leftrightarrow XはリストYに含まれる$$というpredicateを用意して、探索した。hamiltonsubは残りの頂点集合、現在いる頂点、辺集合Eをもらって残りを探索する。hamiltonはスタートする頂点を全て試しながらhamiltonsubを呼ぶ。
+全探索するので、存在するハミルトンパスの数だけtrueが出る。
+\section*{発展1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- interpreter("+++++++++[>++++++++>+++++++++++>+++>+<<<<-]>.>++.+++++++..+++.>+++++.<<+++++++++++++++.>.+++.------.--------.>+.>+.").
+Hello World!
+true ;
+false.
+\end{lstlisting}
+\subsection*{考察}
+以下はきちんと意味論が展開されていないためふんわりとした説明である。
+チューリング完全の定義を調べて見た.
+任意のチューリングマシンでの任意の入力に対する計算が可能な計算モデルを万能チューリングマシンといい、万能チューリングマシンと同じ計算能力を持つときその計算モデルをチューリング完全というそうである。
+Brainfuckは命令数の非常に少ない言語であり、チューリング完全であることが知られている言語である。BrainfuckのインタプリタをPrologで書くことで、Prologがチューリング完全であることを示すという方法をとった。
+以下でインタプリタの実装についてと,Prologの理解が甘かったために実装中に困った点について説明する。
+\subsubsection*{インタプリタの実装}
+メモリの状態を表す整数のリストと、ポインタとプログラムカウンタでマシンの状態を表せる。
+手続き型の言語のインタプリタなので、Prologの述語は全て引数のうち前のいくつかを決めてやることで後半の全てが決定するような関数のようなものばかりで構成した。Parserの実装は面倒なので標準である述語string\_to\_listを用いた。
+実装したいくつかの述語について説明する。
+\begin{itemize}
+	\item interpreter(X) \par
+	brainfuckのソースとして正しいものかどうかを返す熟語。
+	ソースコードを文字列として受け取って実行する。
+	エラーの場合やSyntax errorの場合falseとなる。
+	文字列をパースして整数のリストにし、下のexecを初期状態で呼び出す。
+	\item exec(Code,Length,Counter,Memory,Pointer) \par
+	プログラムカウンタがCounterで、メモリとポインタがMemory.Pointerの状態から最後まで正しく実行できるかどうかの述語。
+	各命令に合わせてマシンの状態を変化させ、再帰的にexecを呼び出す。
+	CounterがCodeの最後まで来たら、trueとなり、プログラムに問題があればfalseとなる。
+	\item increase/decrease memory,increase/decrease pointer,correspond\_start/end\_position \par
+	各命令を実行した後のマシンの状態を求めるために補助的に用意した述語(関数)。名前から行っていることはわかると思うので詳細は実装を見ていただきたいです。
+\end{itemize}
+\subsubsection*{Prologの理解}
+実装をする際にPrologの整数演算の扱いの理解が甘く悩んだのでそこで得た知見について説明する。Prolog=は値の比較ではなく単一化を表すということを理解していなかったため、1+2=3がfalse.で困惑した。整数演算を評価した結果を比較したい場合は$\texttt{<,>,=:=}$などの演算子を用いる必要があることを学んだ。また整数演算の評価結果を未決定の変数が等しいことは$\texttt{X is 1+2}$のようにすることでできるとわかった。
+\subsubsection*{Brainfuckの言語仕様}
+\end{document}

@@ -1,0 +1,51 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:36:41 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Fri Jun 21 14:52:42 2019
+# Process ID: 10700
+# Current directory: /home/tansei/UTokyo/Funclogic/week8/problem5
+# Command line: vivado
+# Log file: /home/tansei/UTokyo/Funclogic/week8/problem5/vivado.log
+# Journal file: /home/tansei/UTokyo/Funclogic/week8/problem5/vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project /home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.xpr
+reset_run synth_1
+update_compile_order -fileset sources_1
+update_module_reference design_1_uart_loopback_0_0
+launch_runs synth_1 -jobs 4
+wait_on_run synth_1
+reset_run synth_1
+set_property location {3 687 76} [get_bd_cells uart_loopback_0]
+startgroup
+set_property -dict [list CONFIG.CLK_PER_HALF_BIT {434}] [get_bd_cells uart_loopback_0]
+endgroup
+save_bd_design
+launch_runs impl_1 -to_step write_bitstream -jobs 4
+wait_on_run impl_1
+open_hw
+connect_hw_server
+open_hw_target
+set_property PROGRAM.FILE {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/impl_1/design_1_wrapper.bit} [get_hw_devices xc7a35t_0]
+current_hw_device [get_hw_devices xc7a35t_0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices xc7a35t_0] 0]
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/impl_1/design_1_wrapper.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+open_bd_design {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd}
+startgroup
+set_property -dict [list CONFIG.CLK_PER_HALF_BIT {200}] [get_bd_cells uart_loopback_0]
+endgroup
+save_bd_design
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 4
+wait_on_run impl_1
+set_property PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property FULL_PROBES.FILE {} [get_hw_devices xc7a35t_0]
+set_property PROGRAM.FILE {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.runs/impl_1/design_1_wrapper.bit} [get_hw_devices xc7a35t_0]
+program_hw_devices [get_hw_devices xc7a35t_0]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+open_bd_design {/home/tansei/Hardware/kadai0620/jikken10-2/uart_loopback_kit/test_uart_loopback_9600/test_uart_loopback_9600.srcs/sources_1/bd/design_1/design_1.bd}

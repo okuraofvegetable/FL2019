@@ -1,0 +1,222 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題8}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{考察}
+手で解いた結果はそれぞれ
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+[(alpha := Int),(beta := Int -> Int)]
+TypeError
+[(alpha := Int),(beta := Int)]
+[(a1 := b1 -> b2),(a2 := b1 -> b2),(a3 := b1 -> b2)]
+TypeError
+\end{lstlisting}
+で、これは上の問4で実装し、動作例で示したunifyの結果と合致する。
+\section*{問2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# #use "tySyntax.ml";;
+val ty_subst : (tyvar * ty) list -> ty -> ty = <fun>
+....
+# let sigma = [(1,TyInt);(2,TyFun(TyInt,TyInt))] in
+  let t = TyFun((TyVar 1),(TyVar 2)) in
+  ty_subst sigma t;;
+- : ty = TyFun (TyInt, TyFun (TyInt, TyInt))
+\end{lstlisting}
+\subsection*{考察}
+$\texttt{TyInt,TyBool}$ならばそのまま返し、$\texttt{TyFun(x,y)}$ならばx,yを再帰的にsubstituteする。$\texttt{TyVar id}$ならばsigmaをidで検索し、なかったらそのまま、あれば置き換える、というように実装した。
+\section*{問3}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let sigma1 = [(1,TyInt)] in
+  let sigma2 = [(2,(TyVar 1))] in
+  let sigma1_sigma2 = compose sigma1 sigma2 in
+  ty_subst sigma1_sigma2 (TyVar 2);;
+- : ty = TyInt
+\end{lstlisting}
+\subsection*{考察}
+はじめ$\sigma_2$を$\sigma_1$より前にconcatするだけにしていたが、上の動作例のように多段で変換される時に正しく動かなかったので関数合成にちゃんとなるように修正した。
+まず、$\texttt{domain : subst -> tyvar list}$という$\sigma$の定義域のような(正確には定義域ではないが、substのlistのペアの左側に現れるtyvarの集合、これ以外のtyvarは置き換えられずそのままになる)ものを求める関数を定義した。composeでは$\sigma_1,\sigma_2$のdomainの和集合を求め、その元tvに対し
+$\texttt{ty\_subst sigma1 (ty\_subst sigma2 (TyVar tv))}$ を割り当てるような$\texttt{subst}$を作って返すようにした。
+\section*{問4}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# #use "tySyntax.ml";;
+......
+# let alpha = TyVar( new_tyvar () ) in 
+  let beta = TyVar ( new_tyvar () ) in
+  [(alpha,TyInt);(beta,TyFun(alpha,alpha))];;
+- : (ty * ty) list = [(TyVar 1, TyInt); (TyVar 2, TyFun (TyVar 1, TyVar 1))]
+# let alpha = TyVar( new_tyvar () ) in 
+  let beta = TyVar ( new_tyvar () ) in
+  unify [(alpha,TyInt);(beta,TyFun(alpha,alpha))];;
+- : (tyvar * ty) list = [(3, TyInt); (4, TyFun (TyInt, TyInt))]
+# let alpha = TyVar( new_tyvar () ) in 
+  unify [(TyInt,TyFun(TyInt,alpha))];;
+Exception: TyError.
+# let alpha = TyVar( new_tyvar () ) in 
+  let beta = TyVar ( new_tyvar () ) in
+  unify [(TyFun(TyInt,TyInt),TyFun(alpha,beta))];;
+- : (tyvar * ty) list = [(6, TyInt); (7, TyInt)]
+# let a1 = TyVar (new_tyvar ()) in
+  let a2 = TyVar (new_tyvar ()) in
+  let a3 = TyVar (new_tyvar ()) in
+  let b1 = TyVar (new_tyvar ()) in
+  let b2 = TyVar (new_tyvar ()) in
+  unify [(TyFun(a1,a2),TyFun(a2,a3));(a3,TyFun(b1,b2))];;
+- : (tyvar * ty) list =
+[(8, TyFun (TyVar 11, TyVar 12)); (9, TyFun (TyVar 11, TyVar 12));
+ (10, TyFun (TyVar 11, TyVar 12))]
+# let alpha = TyVar (new_tyvar ()) in
+  let beta = TyVar (new_tyvar ()) in
+  let gamma = TyVar (new_tyvar ()) in
+  unify [(TyFun(alpha,alpha),TyFun(beta,gamma));(gamma,TyFun(TyInt,beta))];;
+Exception: TyError.
+\end{lstlisting}
+\subsection*{考察}
+動作例は問1の各制約集合に対して最汎単一化子を求めたものである。問1の考察でも述べたとおりこの結果は手で計算した結果と合致する。まず出現検査のために型と型変数を受け取ってその型に型変数が含まれているかをbool値で返す関数include\_tyvarを定義した。これはty\_substと同じように型の構造に関して帰納的に求めればよい。あとは講義の単一化アルゴリズムのスライドを参考にしながらパターンマッチで条件分岐して求めた。一度バグらせた原因として、制約集合から選んだ1つの制約が両方型変数でかつそれらが一致する時は、スライドの2つめのケース($\{s=s\}\cup C$のケース)に相当し、4,5番目のケースでないということがあった。スライドの順番通りに判定しないと思わぬ落とし穴があった。
+\section*{}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# let f = fun x -> fun y -> x;;
+for all a2 a1 
+ ( a1 ->  ( a2 ->  a1 ))
+val f = <fun>
+# let rec fix f = fun x -> f (fix f) x;;
+for all a6 a3 
+ ( ( ( a3 ->  a6 )->  ( a3 ->  a6 ))->  ( a3 ->  a6 ))
+val fix = <rec fun>
+# let rec f n = if n = 0 then 0 else n + f (n-1) in f 10;;
+for all 
+ int
+- = 55
+# let apply = fun f ->  fun x -> let g = f in if true then f 1 else f true;;
+Fatal error: exception TySyntax.TyError
+--------------------------------------------------
+# let id = fun x -> x in
+  let apply = fun f -> if f true then f 1 else f false in
+  apply id;;
+Fatal error: exception TySyntax.TyError
+--------------------------------------------------
+# let id = fun x -> x in
+  if id true then id 1 else id 3;;
+for all 
+ int
+- = 1
+# let id = fun x -> x in
+  if id true then id 1 else id false;;
+Fatal error: exception TySyntax.TyError
+\end{lstlisting}
+\subsection*{考察}
+スライドの方針にしたがって実装した。多数の補助関数を作成した。
+スライドの内容を理解するのに時間がかかった部分としては、「型環境に現れる」というのは量化子に束縛されていないもので、型環境の変数の型スキーマの中に現れるという意味であるというところだった。量化子で束縛されたものに関しては名前が重要なのではないので変数の「自由な出現」と束縛されたものの区別を意識しながら実装した。
+instantiateは型スキーマを受け取って量化子に束縛された変数を全て新たな型変数で置き換えた型を返した。get\_type\_varsは型に含まれる型変数のリストを求めるもので、ty\_substと同様に型の構造に関して帰納的に求めれば良い。この他に、型スキーマを受け取って量化子に束縛されていない型変数のリストを返す$\texttt{get\_free\_tyvars\_from\_tysc}$や型環境の全ての変数の型スキーマの,自由に出現する変数の集合の和集合を求める$\texttt{get\_free\_tyvars\_from\_tyenv}$,$\sigma$での置き換えを引数のリスト内の型変数にのみ行う$\texttt{ty\_subst\_limited}$などを実装した。generalizeは、型推論が終わった後に未決定のまま残っている型変数のうち、型環境で自由に出現しない型変数たちに量化子をつけて型スキーマに拡張する関数であり、定義した補助関数たちを用いて実装した。eval.mlのinfer\_exprは型環境の定義の変更に伴って、適宜変更し,let in等型環境を変更するものについてもスライドを参考にしながら変更を施した。
+実装しているときにlet in式の制約収集のスライドで行われている$\Delta = \Gamma \sigma$の変換が必要なのか疑問に思った。なぜなら型環境が更新される際は未決定の型変数全てが一般化されて量化子に束縛されるのでこの変換で型環境は変化しないのではないかと思ったからである。友人たちに相談してみるとこの置き換えをしないとうまく行かない例として$\texttt{fun x -> let g = fun y -> x y in g 4}$というものを教えてもらえた。関数抽象の評価の途中では型環境の中に量化子に束縛されていない型変数を含む状態(この例ではx)で評価されることがあるので$\Delta$の必要性がわかった。
+\section*{発展1}
+\subsection*{考察}
+まず今まで実装してきた型システムにおける型は、
+\begin{itemize}
+  \item $\texttt{int,bool}$は型
+  \item \texttt{s,t}が型の時$\texttt{s->t}$は型
+\end{itemize}
+というように帰納的に構成されており、情報論理のtermのように深さ有限の木構造で表せるものを考えている。$\alpha=t$($t$は$\alpha$でない)という形の制約を満たすものは、tの中の$\alpha$にtを代入することを繰り返すことでいくらでもtの構成を表す木の深さがいくらでも大きくなる。なので出現検査を行わなければならない。出現検査をしないことは、再帰的な型を考えることに相当する。
+\section*{発展2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+# (1,2);;
+for all 
+ ( int,  int)
+- = (1,2)
+# (1,1);;
+for all 
+(same pair  int)
+- = (1,same)
+# let x = fun x -> (x,x) in
+  x (fun x -> x);;
+for all a3 
+(same pair  ( a3 ->  a3 ))
+- = (<fun>,same)
+# let x = fun x -> (x,x) in 
+  let x = fun y -> x (x y) in
+  x (fun x -> x);;
+for all a12 
+(same pair (same pair  ( a12 ->  a12 )))
+- = ((<fun>,same),same)
+# let x = fun x -> (x,x) in 
+  let x = fun y -> x (x y) in
+  let x = fun y -> x (x y) in
+  let x = fun y -> x (x y) in
+  let x = fun y -> x (x y) in
+  let x = fun y -> x (x y) in
+    x (fun x -> x);;
+for all a41 
+(same pair (same pair (same pair (same pair (same pair (same pair 
+(same pair (same pair (same pair (same pair (same pair (same pair 
+(same pair (same pair (same pair (same pair (same pair (same pair 
+(same pair (same pair (same pair (same pair (same pair (same pair 
+(same pair (same pair (same pair (same pair (same pair (same pair 
+(same pair (same pair  ( a41 ->  a41 )))))))))))))))))))))))))))))))))
+- = ((((((((((((((((((((((((((((((((<fun>,same),same),same),same),
+same),same),same),same),same),same),same),same),same),same),same),
+same),same),same),same),same),same),same),same),same),same),same),
+same),same),same),same),same),same)
+\end{lstlisting}
+\subsection*{考察}
+いままでのインタプリタで上の式の型推論の結果が返ってこないのは、infer\_exprの計算量が非常に大きいからである。式の評価結果の値の型は非常に大きいのでなんども再帰的にinfer\_exprが呼び出される。ここでinfer\_exprの引数に着目すると、何度も同じ引数で呼ばれることがわかる。何度も同じ引数で再計算するのは無駄なので、フィボナッチ数を求める場合などと同様にメモ化したくなった。しかし関数型言語でメモ化するのは副作用をあつかうことになり第4回の課題でやったようにモナドを用いなければならない。それは面倒なので、今回の式では同じものの組が何度も作られることに着目し、$\texttt{TyPair(x,y)}$の型推論をするときに、xとyが同一ならば一方しか評価しないようにした。(メモ化と比較すると多少一般性は失われてしまうが)\par
+次に型の表し方についての工夫を説明する。
+実際の値の型を真面目に扱うのは難しそうなのでより短い形式で表すことを考える。上の式では同じもののペア$\texttt{(x,x)}$が何度も作られるのでこれを$\texttt{(x,same)}$と表すことにする。
+内部的にも$\texttt{TySamePair}$というものを用意した。こうすることで、例えば$(((x,x),(x,x)),((x,x),(x,x)))$ならば$(((x,same),same),same)$と短く書ける。このように型推論において、同じもののペアを特別に扱うことは式の値ではなく式(型expr)から判断するので、高速に判定できる。(値(value)は表現すると非常に大きいかもしれないが、構文(expr)は上の7行をparseしたもので短い。)
+これで今回の式の値のようなものの巨大な型を短い形式で表すことができた。以上の2つの工夫によって動作例のように与えられた式の型推論ができるようになった。
+\section*{発展3}
+\subsection*{要約}
+unificationアルゴリズムの停止性を示すために、structural recursionでないunificationアルゴリズムをstructural recursionの形で書けるように再定式化している。structural recursionで書くことができれば停止性は定義より明らかとなるので
+、そのように定式化することで停止性が証明される。
+これ以降出てくる帰納的な定義はすべて構造帰納のものである。\par
+2章では"n種類の型の集合の元"の型であるFin nの帰納的定義が与えられている。
+直感的には以下の表のようになる。
+\begin{table}[h]
+\begin{tabular}{lllll}
+\multicolumn{1}{l|}{Fin 1} & $f0_0$ &             &                   &  \\
+\multicolumn{1}{l|}{Fin 2} & $f0_1$ & $fs_0$ $f0_0$ &                   &  \\
+\multicolumn{1}{l|}{Fin 3} & $f0_2$ & $fs_1$ $f0_1$ & $fs_2$ $fs_1$ $f0_0$ &  \\
+                           &       &             &                   & 
+\end{tabular}
+\end{table}
+また、structural recursionで書ける関数のクラスはprimitive recursive functionのクラスよりも広いことが述べられている(アッカーマン関数がその例として挙げられている。)
+Fin nのようなInductive familyを用いることでgeneral recursion内の再帰構造を明示的なstructural recursionに変えることができる。\par
+3章ではFin nの値(Fin nは型の型なのでこれは型であることに注意)のインスタンスなどの型Term nが帰納的に定義されている。\par
+4章ではoccurence checkについてthin,thickという関数を通して説明されている。
+thinは、Fin nの値の集合から、Fin snの値の集合から1つを除いた集合への全単射を定めており、帰納的に定義されている。$thin_n\ x\ y$はその全単射でのFin nの値yの行き先で、Fin snの値の集合からxを除いた集合の元である。thinの逆関数のようなものがthickで、xとyが同じ時はno(OCamlのオプション型のNoneに相当)を返し,そうでない場合はthick xはthin xの逆関数のようになっている。このthickも帰納的に定義されている。
+Fin snの値xとTerm snの値tについて、tにxが現れるかどうかはthickを用いて帰納的に検査できる。\par
+5章では$m,n\in \mathbb{N}$で添字付けられた型AList m nの値をsyntaxとしてsubstitution(これはFin m $\rightarrow$ Term nのような型をもつ)のsemanticsが帰納的に定義されている。
+また、AList m nのnは重要ではなく、あるnが存在することが重要なのでnと型AList m nの組を新たな型$\exists (AList\ m)$の値としている。\par
+6章ではここまでで準備した構造帰納で定義されたものを用いてunificationアルゴリズムを構造帰納で書いている。特に着目すべきはamguの8つめのケースでサイズが1つ落ちていることである。flexFlex,flexRigidの場合もthickやcheckを用いて書けるので全体として構造帰納になっている。はじめにも述べた通り、構造帰納で書けたことによりただちにunificationアルゴリズムの停止性がわかる。
+\subsection*{感想}
+Fin nのように型の型(Inductive family)を考えるという発想が初めてで面白いと思った。Fin n,Term nだけに限らず、thinのような全単射の構成も構造帰納で綺麗に定義でき、unificationアルゴリズムが最終的に様々な面で何重にも構造帰納を含む形で書けるのが美しいと思った。
+読んでいる途中にsyntaxとsemanticsを混同して混乱してしまったが、もう一度読み直すとしっかりとこれらが分けて与えられていてわかりやすかった。dependent type(依存型)という単語が何度も現れたので調べてみたがよくわからなかったので理解したい。
+\end{document}
