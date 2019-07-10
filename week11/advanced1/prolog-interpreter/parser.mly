@@ -9,6 +9,7 @@
 %token RULE QUERY
 %token LPAR RPAR 
 %token DOT SEMI
+%token LBRACKET RBRACKET BAR NIL
 
 %start toplevel 
 %type <Syntax.command> toplevel
@@ -40,6 +41,7 @@ predicates:
 
 predicate:
   | SYMBID LPAR terms RPAR { EPdSymb($1,$3) }
+  | SYMBID { EPdSymb($1,[]) }
 ;
 
 terms:
@@ -60,4 +62,8 @@ symbs:
 atomic:
   | SYMBID { EFnSymb($1,[]) }
   | VARID  { EVar($1) }
+  | list   { $1 }
 ;
+list:
+  | NIL { ENil }
+  | LBRACKET atomic BAR atomic RBRACKET { ECons($2,$4) }

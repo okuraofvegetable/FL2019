@@ -4,6 +4,8 @@ type var = int
 type term =
   | EFnSymb  of name * (term list)
   | EVar of name
+  | ECons of term * term
+  | ENil
 
 type fact = EPdSymb of name * (term list)
 
@@ -44,6 +46,8 @@ let rec get_vars_term t =
   match t with
   | EFnSymb (_,tl) -> concat_merge (List.map (fun s -> get_vars_term s) tl) 
   | EVar id -> [id]
+  | ECons (x,y) -> merge_list (get_vars_term x) (get_vars_term y)
+  | ENil -> []
 
 let rec get_vars_fact fac =
   match fac with
@@ -68,6 +72,8 @@ let rec convert_term t sigma =
   match t with
   | EFnSymb (id,tl) -> EFnSymb (id, convert_term_list tl sigma)
   | EVar n -> EVar (List.assoc n sigma)
+  | ECons (x,y) -> ECons ((convert_term x sigma),(convert_term y sigma))
+  | ENil -> ENil
 
 and convert_term_list tl sigma = 
   match tl with
@@ -108,6 +114,12 @@ let rec print_term t =
                        if tl=[] then ()
                                 else (print_string "(";print_term_list tl;print_string ")")
   | EVar id -> print_name id
+  | ECons (x,y) -> print_string "[";
+                   print_term x;
+                   print_string " | ";
+                   print_term y;
+                   print_string "]"
+  | ENil -> print_string "[]"
 and print_term_list tl = 
   match tl with
   | [] -> ()

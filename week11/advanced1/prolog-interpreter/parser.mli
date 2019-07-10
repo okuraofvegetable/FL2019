@@ -9,6 +9,10 @@ type token =
   | RPAR
   | DOT
   | SEMI
+  | LBRACKET
+  | RBRACKET
+  | BAR
+  | NIL
 
 val toplevel :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Syntax.command

@@ -11,6 +11,8 @@ let rec term_subst sigma t =
 	match t with
 	| EFnSymb (f,fl) -> let new_fl = List.map (fun s -> term_subst sigma s) fl in EFnSymb(f,new_fl)
 	| EVar id -> (try (lookup id sigma) with Not_found -> EVar id)
+	| ECons (x,y) -> ECons ((term_subst sigma x),(term_subst sigma y))
+	| ENil -> ENil
 
 let rec fact_subst sigma t = 
 	match t with 
@@ -47,7 +49,7 @@ let rec compose s t = let u = domain_union (domain s) (domain t) in make_subst s
 
 (* term -> term ->  constraints *)
 let rec collect_constraints s t =
-	match (s,t) with
+	(*match (s,t) with
 	| (EFnSymb (f,fl),EFnSymb (g,gl)) -> if (f=g && List.length(fl)=List.length(gl))
 											 then List.concat (List.map (fun (a,b) -> collect_constraints a b) (List.combine fl gl))
 											 else (raise UnifyError) 
@@ -55,6 +57,23 @@ let rec collect_constraints s t =
 	| (EVar x,EFnSymb (f,fl)) -> [(EVar x,EFnSymb (f,fl))]
 	| (EFnSymb (f,fl),EVar x) -> [(EVar x,EFnSymb (f,fl))]
 	| (EVar x,EVar y) -> [(EVar x,EVar y)]
+	| _ -> (raise UnifyError)*)
+	match s with 
+	| EVar x -> [(s,t)]
+	| EFnSymb (f,fl) -> (match t with
+						 | EVar x -> [(s,t)]
+						 | EFnSymb(g,gl) -> if ((f = g) && (List.length fl) = (List.length gl))
+						 						then List.concat (List.map (fun (a,b) -> collect_constraints a b) (List.combine fl gl))
+						 					else (raise UnifyError)
+						 | _ -> (raise UnifyError))
+	| ECons (x1,y1) -> (match t with
+				  		| ECons (x2,y2) -> (collect_constraints x1 x2)@(collect_constraints y1 y2)
+				  		| EVar x -> [(s,t)]
+				  		| _ -> (raise UnifyError))
+	| ENil -> (match t with
+			   | EVar x -> [(s,t)]
+			   | ENil -> []
+			   | _ -> (raise UnifyError))
 
 (* fact -> fact -> constraints *)
 let collect_constraints_fact s t = 
@@ -63,17 +82,21 @@ let collect_constraints_fact s t =
 											 then List.concat (List.map (fun (a,b) -> collect_constraints a b) (List.combine pl ql))
 											 else (raise UnifyError)
 exception IncludeVarError
-let include_var x vl = 
-	match vl with
-	| [] -> false
-	| n::rest -> if n=x then (raise IncludeVarError)
-				 else false
+(* name -> term -> bool *)
+let rec include_var x t =
+	match t with
+	| EFnSymb (f,tl) -> let _ = List.map (fun s -> include_var x s) tl in false
+	| EVar y -> if x=y then (raise IncludeVarError)
+				else false
+	| ECons (a,b) -> let _ = include_var x a in
+					 let _ = include_var x b in false
+	| ENil -> false 
 (* constraints -> subst *)
 let rec unify cl =
 	match cl with
 	| [] -> []
 	| (s,t)::rest ->
-		(match (s,t) with
+		(*(match (s,t) with
 		 | (EVar x,EFnSymb (f,fl)) ->
 		 	(try(
 		 		let _ = List.map (fun y -> let vl = get_vars_term y in include_var x vl) fl in
@@ -81,7 +104,25 @@ let rec unify cl =
 			)with | IncludeVarError -> (raise UnifyError))
 		 | (EVar x,EVar y) -> if x = y then (unify rest) 
 							  else compose (unify (constraints_subst [x,EVar y] rest)) [x,EVar y] 
-		 | _ -> (raise UnifyError))
+		 | _ -> (raise UnifyError))*)
+		(match s with
+		 | EVar x -> (match t with
+		 			  | EVar y -> if x=y then (unify rest)
+		 						  else compose (unify (constraints_subst [x,EVar y] rest)) [x,EVar y]
+		 			  | _ -> (try (let _ = include_var x t in compose (unify (constraints_subst [x,t] rest)) [x,t]) with
+		 			  		  | IncludeVarError -> (raise UnifyError) ))
+		 | EFnSymb (f,fl) -> (match t with
+		 					  | EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
+		 			  		               | IncludeVarError -> (raise UnifyError))
+		 			  		  | _ -> (raise UnifyError))
+		 | ECons (a,b) -> (match t with
+	 					   | EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
+	 			  		                | IncludeVarError -> (raise UnifyError))
+	 			  		   | _ -> (raise UnifyError))
+		 | ENil -> (match t with
+	 				| EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
+	 			  		         | IncludeVarError -> (raise UnifyError))
+	 			  	| _ -> (raise UnifyError)))
 
 (*  make next state
 	rule -> ((fact list) * subst) -> ((fact list) * subst)

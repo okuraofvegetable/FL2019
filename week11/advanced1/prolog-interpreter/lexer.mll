@@ -10,6 +10,10 @@ rule main = parse
 | "rule"        { Parser.RULE }
 | "query"       { Parser.QUERY }
 | ":-"          { Parser.IMPLY }
+| "[]"          { Parser.NIL }
+| "["           { Parser.LBRACKET }
+| "]"           { Parser.RBRACKET }
+| "|"           { Parser.BAR }
 | "("           { Parser.LPAR }
 | ")"           { Parser.RPAR }
 | ","           { Parser.COMMA}

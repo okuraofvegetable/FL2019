@@ -16,20 +16,25 @@
   10             | predicate COMMA predicates
 
   11  predicate : SYMBID LPAR terms RPAR
+  12            | SYMBID
 
-  12  terms : term
-  13        | term COMMA terms
+  13  terms : term
+  14        | term COMMA terms
 
-  14  term : atomic
-  15       | SYMBID LPAR symbs RPAR
+  15  term : atomic
+  16       | SYMBID LPAR symbs RPAR
 
-  16  symbs : atomic
-  17        | atomic COMMA symbs
+  17  symbs : atomic
+  18        | atomic COMMA symbs
 
-  18  atomic : SYMBID
-  19         | VARID
+  19  atomic : SYMBID
+  20         | VARID
+  21         | list
 
-  20  %entry% : '\001' toplevel
+  22  list : NIL
+  23       | LBRACKET atomic BAR atomic RBRACKET
+
+  24  %entry% : '\001' toplevel
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -41,7 +46,7 @@ state 0
 
 
 state 1
-	%entry% : '\001' . toplevel  (20)
+	%entry% : '\001' . toplevel  (24)
 
 	RULE  shift 3
 	QUERY  shift 4
@@ -94,16 +99,20 @@ state 6
 
 
 state 7
-	%entry% : '\001' toplevel .  (20)
+	%entry% : '\001' toplevel .  (24)
 
-	.  reduce 20
+	.  reduce 24
 
 
 state 8
 	predicate : SYMBID . LPAR terms RPAR  (11)
+	predicate : SYMBID .  (12)
 
 	LPAR  shift 15
-	.  error
+	$end  reduce 12
+	IMPLY  reduce 12
+	COMMA  reduce 12
+	DOT  reduce 12
 
 
 state 9
@@ -153,11 +162,14 @@ state 15
 
 	SYMBID  shift 19
 	VARID  shift 20
+	LBRACKET  shift 21
+	NIL  shift 22
 	.  error
 
-	terms  goto 21
-	term  goto 22
-	atomic  goto 23
+	terms  goto 23
+	term  goto 24
+	atomic  goto 25
+	list  goto 26
 
 
 state 16
@@ -166,7 +178,7 @@ state 16
 	SYMBID  shift 8
 	.  error
 
-	predicates  goto 24
+	predicates  goto 27
 	predicate  goto 14
 
 
@@ -182,143 +194,210 @@ state 18
 	SYMBID  shift 8
 	.  error
 
-	predicates  goto 25
+	predicates  goto 28
 	predicate  goto 14
 
 
 state 19
-	term : SYMBID . LPAR symbs RPAR  (15)
-	atomic : SYMBID .  (18)
+	term : SYMBID . LPAR symbs RPAR  (16)
+	atomic : SYMBID .  (19)
 
-	LPAR  shift 26
-	COMMA  reduce 18
-	RPAR  reduce 18
+	LPAR  shift 29
+	COMMA  reduce 19
+	RPAR  reduce 19
 
 
 state 20
-	atomic : VARID .  (19)
+	atomic : VARID .  (20)
 
-	.  reduce 19
+	.  reduce 20
 
 
 state 21
-	predicate : SYMBID LPAR terms . RPAR  (11)
+	list : LBRACKET . atomic BAR atomic RBRACKET  (23)
 
-	RPAR  shift 27
+	SYMBID  shift 30
+	VARID  shift 20
+	LBRACKET  shift 21
+	NIL  shift 22
 	.  error
+
+	atomic  goto 31
+	list  goto 26
 
 
 state 22
-	terms : term .  (12)
-	terms : term . COMMA terms  (13)
+	list : NIL .  (22)
 
-	COMMA  shift 28
-	RPAR  reduce 12
+	.  reduce 22
 
 
 state 23
-	term : atomic .  (14)
+	predicate : SYMBID LPAR terms . RPAR  (11)
 
-	.  reduce 14
-
-
-state 24
-	rule : predicate IMPLY predicates . DOT  (8)
-
-	DOT  shift 29
+	RPAR  shift 32
 	.  error
 
 
+state 24
+	terms : term .  (13)
+	terms : term . COMMA terms  (14)
+
+	COMMA  shift 33
+	RPAR  reduce 13
+
+
 state 25
+	term : atomic .  (15)
+
+	.  reduce 15
+
+
+state 26
+	atomic : list .  (21)
+
+	.  reduce 21
+
+
+state 27
+	rule : predicate IMPLY predicates . DOT  (8)
+
+	DOT  shift 34
+	.  error
+
+
+state 28
 	predicates : predicate COMMA predicates .  (10)
 
 	.  reduce 10
 
 
-state 26
-	term : SYMBID LPAR . symbs RPAR  (15)
+state 29
+	term : SYMBID LPAR . symbs RPAR  (16)
 
 	SYMBID  shift 30
 	VARID  shift 20
+	LBRACKET  shift 21
+	NIL  shift 22
 	.  error
 
-	atomic  goto 31
-	symbs  goto 32
+	atomic  goto 35
+	symbs  goto 36
+	list  goto 26
 
 
-state 27
+state 30
+	atomic : SYMBID .  (19)
+
+	.  reduce 19
+
+
+state 31
+	list : LBRACKET atomic . BAR atomic RBRACKET  (23)
+
+	BAR  shift 37
+	.  error
+
+
+state 32
 	predicate : SYMBID LPAR terms RPAR .  (11)
 
 	.  reduce 11
 
 
-state 28
-	terms : term COMMA . terms  (13)
+state 33
+	terms : term COMMA . terms  (14)
 
 	SYMBID  shift 19
 	VARID  shift 20
+	LBRACKET  shift 21
+	NIL  shift 22
 	.  error
 
-	terms  goto 33
-	term  goto 22
-	atomic  goto 23
+	terms  goto 38
+	term  goto 24
+	atomic  goto 25
+	list  goto 26
 
 
-state 29
+state 34
 	rule : predicate IMPLY predicates DOT .  (8)
 
 	.  reduce 8
 
 
-state 30
-	atomic : SYMBID .  (18)
+state 35
+	symbs : atomic .  (17)
+	symbs : atomic . COMMA symbs  (18)
+
+	COMMA  shift 39
+	RPAR  reduce 17
+
+
+state 36
+	term : SYMBID LPAR symbs . RPAR  (16)
+
+	RPAR  shift 40
+	.  error
+
+
+state 37
+	list : LBRACKET atomic BAR . atomic RBRACKET  (23)
+
+	SYMBID  shift 30
+	VARID  shift 20
+	LBRACKET  shift 21
+	NIL  shift 22
+	.  error
+
+	atomic  goto 41
+	list  goto 26
+
+
+state 38
+	terms : term COMMA terms .  (14)
+
+	.  reduce 14
+
+
+state 39
+	symbs : atomic COMMA . symbs  (18)
+
+	SYMBID  shift 30
+	VARID  shift 20
+	LBRACKET  shift 21
+	NIL  shift 22
+	.  error
+
+	atomic  goto 35
+	symbs  goto 42
+	list  goto 26
+
+
+state 40
+	term : SYMBID LPAR symbs RPAR .  (16)
+
+	.  reduce 16
+
+
+state 41
+	list : LBRACKET atomic BAR atomic . RBRACKET  (23)
+
+	RBRACKET  shift 43
+	.  error
+
+
+state 42
+	symbs : atomic COMMA symbs .  (18)
 
 	.  reduce 18
 
 
-state 31
-	symbs : atomic .  (16)
-	symbs : atomic . COMMA symbs  (17)
+state 43
+	list : LBRACKET atomic BAR atomic RBRACKET .  (23)
 
-	COMMA  shift 34
-	RPAR  reduce 16
+	.  reduce 23
 
 
-state 32
-	term : SYMBID LPAR symbs . RPAR  (15)
-
-	RPAR  shift 35
-	.  error
-
-
-state 33
-	terms : term COMMA terms .  (13)
-
-	.  reduce 13
-
-
-state 34
-	symbs : atomic COMMA . symbs  (17)
-
-	SYMBID  shift 30
-	VARID  shift 20
-	.  error
-
-	atomic  goto 31
-	symbs  goto 36
-
-
-state 35
-	term : SYMBID LPAR symbs RPAR .  (15)
-
-	.  reduce 15
-
-
-state 36
-	symbs : atomic COMMA symbs .  (17)
-
-	.  reduce 17
-
-
-13 terminals, 12 nonterminals
-21 grammar rules, 37 states
+17 terminals, 13 nonterminals
+25 grammar rules, 44 states
