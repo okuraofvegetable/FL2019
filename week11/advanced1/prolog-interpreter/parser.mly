@@ -5,11 +5,13 @@
 
 %token <string> SYMBID 
 %token <string> VARID 
+%token <string> NUMBER
 %token IMPLY COMMA
 %token RULE QUERY
 %token LPAR RPAR 
 %token DOT SEMI
 %token LBRACKET RBRACKET BAR NIL
+%token NEG
 
 %start toplevel 
 %type <Syntax.command> toplevel
@@ -60,10 +62,13 @@ symbs:
 ;
 
 atomic:
-  | SYMBID { EFnSymb($1,[]) }
+  | SYMBID { EConst($1) }
+  | NUMBER { EConst($1) }
   | VARID  { EVar($1) }
   | list   { $1 }
 ;
+
 list:
   | NIL { ENil }
   | LBRACKET atomic BAR atomic RBRACKET { ECons($2,$4) }
+;

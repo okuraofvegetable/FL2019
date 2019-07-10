@@ -2,6 +2,7 @@ type name = string
 type var = int
 
 type term =
+  | EConst of name
   | EFnSymb  of name * (term list)
   | EVar of name
   | ECons of term * term
@@ -48,6 +49,7 @@ let rec get_vars_term t =
   | EVar id -> [id]
   | ECons (x,y) -> merge_list (get_vars_term x) (get_vars_term y)
   | ENil -> []
+  | EConst c -> []
 
 let rec get_vars_fact fac =
   match fac with
@@ -74,6 +76,7 @@ let rec convert_term t sigma =
   | EVar n -> EVar (List.assoc n sigma)
   | ECons (x,y) -> ECons ((convert_term x sigma),(convert_term y sigma))
   | ENil -> ENil
+  | EConst x -> EConst x
 
 and convert_term_list tl sigma = 
   match tl with
@@ -97,16 +100,7 @@ let instantiate_rule r =
   convert_rule r sigma
 
 
-
-
-    
-(*
- 小さい式に対しては以下でも問題はないが，
- 大きいサイズの式を見やすく表示したければ，Formatモジュール
-   http://caml.inria.fr/pub/docs/manual-ocaml/libref/Format.html
- を活用すること
-*)
-
+(* print functions for debug *)
 
 let rec print_term t = 
   match t with
@@ -120,6 +114,7 @@ let rec print_term t =
                    print_term y;
                    print_string "]"
   | ENil -> print_string "[]"
+  | EConst x -> print_name x 
 and print_term_list tl = 
   match tl with
   | [] -> ()

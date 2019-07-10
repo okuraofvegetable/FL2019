@@ -13,6 +13,7 @@ let rec term_subst sigma t =
 	| EVar id -> (try (lookup id sigma) with Not_found -> EVar id)
 	| ECons (x,y) -> ECons ((term_subst sigma x),(term_subst sigma y))
 	| ENil -> ENil
+	| EConst c -> EConst c
 
 let rec fact_subst sigma t = 
 	match t with 
@@ -49,15 +50,6 @@ let rec compose s t = let u = domain_union (domain s) (domain t) in make_subst s
 
 (* term -> term ->  constraints *)
 let rec collect_constraints s t =
-	(*match (s,t) with
-	| (EFnSymb (f,fl),EFnSymb (g,gl)) -> if (f=g && List.length(fl)=List.length(gl))
-											 then List.concat (List.map (fun (a,b) -> collect_constraints a b) (List.combine fl gl))
-											 else (raise UnifyError) 
-
-	| (EVar x,EFnSymb (f,fl)) -> [(EVar x,EFnSymb (f,fl))]
-	| (EFnSymb (f,fl),EVar x) -> [(EVar x,EFnSymb (f,fl))]
-	| (EVar x,EVar y) -> [(EVar x,EVar y)]
-	| _ -> (raise UnifyError)*)
 	match s with 
 	| EVar x -> [(s,t)]
 	| EFnSymb (f,fl) -> (match t with
@@ -74,6 +66,11 @@ let rec collect_constraints s t =
 			   | EVar x -> [(s,t)]
 			   | ENil -> []
 			   | _ -> (raise UnifyError))
+	| EConst c -> (match t with
+			       | EVar x -> [(s,t)]
+			       | EConst d -> if c = d then []
+			       				 else (raise UnifyError)
+			       | _ -> (raise UnifyError))
 
 (* fact -> fact -> constraints *)
 let collect_constraints_fact s t = 
@@ -90,21 +87,13 @@ let rec include_var x t =
 				else false
 	| ECons (a,b) -> let _ = include_var x a in
 					 let _ = include_var x b in false
-	| ENil -> false 
+	| ENil -> false
+	| EConst c -> false 
 (* constraints -> subst *)
 let rec unify cl =
 	match cl with
 	| [] -> []
 	| (s,t)::rest ->
-		(*(match (s,t) with
-		 | (EVar x,EFnSymb (f,fl)) ->
-		 	(try(
-		 		let _ = List.map (fun y -> let vl = get_vars_term y in include_var x vl) fl in
-				compose (unify (constraints_subst [x,EFnSymb (f,fl)] rest)) [(x,EFnSymb (f,fl))]
-			)with | IncludeVarError -> (raise UnifyError))
-		 | (EVar x,EVar y) -> if x = y then (unify rest) 
-							  else compose (unify (constraints_subst [x,EVar y] rest)) [x,EVar y] 
-		 | _ -> (raise UnifyError))*)
 		(match s with
 		 | EVar x -> (match t with
 		 			  | EVar y -> if x=y then (unify rest)
@@ -122,7 +111,11 @@ let rec unify cl =
 		 | ENil -> (match t with
 	 				| EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
 	 			  		         | IncludeVarError -> (raise UnifyError))
-	 			  	| _ -> (raise UnifyError)))
+	 			  	| _ -> (raise UnifyError))
+		 | EConst c -> (match t with
+	 				    | EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
+	 			  		             | IncludeVarError -> (raise UnifyError))
+	 			  	    | _ -> (raise UnifyError)))
 
 (*  make next state
 	rule -> ((fact list) * subst) -> ((fact list) * subst)

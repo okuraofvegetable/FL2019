@@ -1,6 +1,7 @@
 type token =
   | SYMBID of (string)
   | VARID of (string)
+  | NUMBER of (string)
   | IMPLY
   | COMMA
   | RULE
@@ -13,6 +14,7 @@ type token =
   | RBRACKET
   | BAR
   | NIL
+  | NEG
 
 val toplevel :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Syntax.command

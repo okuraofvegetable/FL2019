@@ -1,4 +1,5 @@
 let digit = ['0'-'9']
+let number = ['1'-'9'] (digit)*
 let space = ' ' | '\t' | '\r' | '\n'
 let lower_alpha = ['a'-'z']
 let capital_alpha = ['A'-'Z'] 
@@ -19,6 +20,8 @@ rule main = parse
 | ","           { Parser.COMMA}
 | "."           { Parser.DOT }
 | ";"           { Parser.SEMI }
+| "\+"          { Parser.NEG }
 | symb  as id   { Parser.SYMBID id }
+| number as num { Parser.NUMBER num }
 | varname as vn { Parser.VARID vn }
 | _             { failwith ("Unknown Token: " ^ Lexing.lexeme lexbuf)}
