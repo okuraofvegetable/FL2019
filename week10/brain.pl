@@ -1,4 +1,3 @@
-
 nth(0,[A|_],A).
 nth(N,[_|X],B) :- 
 	N > 0,
@@ -229,4 +228,7 @@ interpreter(SourceCode) :-
 	Pointer =:= 0,
 	append([0],Memory,NewMemory),
 	NewPointer is Pointer. */
+
+
+
 

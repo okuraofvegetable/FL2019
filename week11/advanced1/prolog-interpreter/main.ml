@@ -1,0 +1,23 @@
+open Syntax
+open Eval
+
+let rec print_sigma table sigma =
+  match table with
+  | [] -> ()
+  | (num,id)::rest -> (if List.mem_assoc num sigma then (Printf.printf "%s = " id;print_term (List.assoc num sigma)));
+                      print_sigma rest sigma
+
+let print_result result sigma table =
+  if result = false 
+    then print_string "false.\n"
+  else print_sigma table sigma;print_string "\n"
+
+let rec read_eval_print oldrules oldqueue oldtable in_progress =
+  (if (in_progress = false) then (print_string "?- "));
+  flush stdout;
+  let cmd = Parser.toplevel Lexer.main (Lexing.from_channel stdin) in
+  let (result,sigma,rules,queue,table,progress) = eval_command cmd oldrules oldqueue oldtable in
+  (print_result result sigma table;
+   read_eval_print rules queue table progress)
+    
+let _ = read_eval_print [] [] [] false
