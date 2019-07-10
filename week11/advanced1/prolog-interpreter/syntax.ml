@@ -16,6 +16,8 @@ type command =
   | CExit
 
 type subst = (name * term) list
+
+type constraints = (term * term) list
 				  
 let print_name = print_string
 
@@ -110,25 +112,30 @@ and print_term_list tl =
   match tl with
   | [] -> ()
   | t::rest -> print_term t;
-               (if (rest <> []) then (print_string ","))
+               (if (rest <> []) then (print_string ",") 
+                                else ());
+               print_term_list rest
 
 let rec print_fact fac =
   match fac with
   | EPdSymb (n,tl) -> print_name n;
                       print_string "(";
-                      print_term_list tl
+                      print_term_list tl;
+                      print_string ")"
 
 let rec print_fact_list fl =
   match fl with
-  | [] -> print_string ")"
+  | [] -> ()
   | (f::rest) -> print_fact f;
-                 if rest <> [] then print_string ","
+                 (if rest <> [] then print_string "," else ());
+                 print_fact_list rest
 
 let rec print_rule r = 
   let (f,fl) = r in
   print_fact f;
   print_string ":- (";
-  print_fact_list fl
+  print_fact_list fl;
+  print_string ")"
 
 let rec print_rules rs = 
   match rs with
@@ -137,4 +144,33 @@ let rec print_rules rs =
                  print_string "\n";
                  print_rules rest
 
+let rec print_subst sigma =
+  match sigma with
+  | [] -> ()
+  | (id,t)::rest -> print_name id;
+                    print_string " -> ";
+                    print_term t;
+                    (if rest <> [] then print_string " , " 
+                                else ());
+                    print_subst rest
+let print_constraint con =
+  let (s,t) = con in
+  print_term s;
+  print_string " = ";
+  print_term t
+
+let rec print_constraints cons =
+  match cons with
+  | [] -> print_string "constraint end\n"
+  | con::rest -> print_constraint con;
+                  print_string "\n";
+                  print_constraints rest
+
+let print_state st =
+  let (fl,sigma) = st in
+  print_string "state:\n  Goals [";
+  print_fact_list fl;
+  print_string "]\n  sigma:\n";
+  print_subst sigma;
+  print_string "\n"
 

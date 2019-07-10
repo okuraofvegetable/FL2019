@@ -1,4 +1,4 @@
-open Syntax 
+(* open Syntax *)
 
 exception UnifyError 
 exception NextStateError 
@@ -100,9 +100,9 @@ let rec next rule state =
 						 				let new_sigma = compose mgu sigma in
 						 				let nql = List.map (fun g -> fact_subst mgu g) ql in
 						 				let nrest = List.map (fun g -> fact_subst mgu g) rest in
-						 				(*print_string "mgu\n";
+						 				print_string "mgu\n";
 						 				print_subst sigma;
-						 				print_string "\n";*)
+						 				print_string "\n";
 						 				[((nql@nrest),new_sigma)]
 						 			)with UnifyError -> [])
 
@@ -112,7 +112,7 @@ let rec search rules queue =
 	(*print_rules rules;*)
 	match queue with 
 	| [] -> (false,[],rules,[],false)
-	| state::rest -> (*print_state state;*)
+	| state::rest -> print_state state;
 		(match state with
 		 | ([],sigma) -> (true,sigma,rules,rest,true)
 		 | _ -> let nexts = List.concat (List.map (fun x -> (next x state)) rules) in
@@ -122,12 +122,12 @@ let rec search rules queue =
 
 let rec eval_command cmd rules queue table = 
 	match cmd with
-	| CRule r -> (true,[],r::rules,[],[],false,true)
+	| CRule r -> (true,[],r::rules,[],[],false)
 	| CQuery q -> let newtable = add_env (get_vars_fact_list q) in
 				  let sigma = List.map (fun (x,y) -> (y,x)) newtable in
 				  let gl = convert_fact_list q sigma in
 				  let (result,sigma,newrules,nque,in_progress) = search rules [(gl,[])] in
-					(result,sigma,newrules,nque,newtable,in_progress,false)
+					(result,sigma,newrules,nque,newtable,in_progress)
 	| CCont -> let (result,sigma,newrules,nque,in_progress) = search rules queue in
-					(result,sigma,newrules,nque,table,in_progress,false)
-	| CExit -> (true,[],rules,[],[],false,true)
+					(result,sigma,newrules,nque,table,in_progress)
+	| CExit -> (true,[],rules,[],[],false)
