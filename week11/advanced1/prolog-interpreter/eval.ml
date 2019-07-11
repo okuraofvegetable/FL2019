@@ -68,8 +68,8 @@ let rec collect_constraints s t =
 			   | _ -> (raise UnifyError))
 	| EConst c -> (match t with
 			       | EVar x -> [(s,t)]
-			       | EConst d -> if c = d then []
-			       				 else (raise UnifyError)
+			       | EConst d -> (if c = d then []
+			       				 else (raise UnifyError))
 			       | _ -> (raise UnifyError))
 
 (* fact -> fact -> constraints *)
@@ -103,18 +103,22 @@ let rec unify cl =
 		 | EFnSymb (f,fl) -> (match t with
 		 					  | EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
 		 			  		               | IncludeVarError -> (raise UnifyError))
+		 					  | EFnSymb (_,_) -> unify ((collect_constraints s t)@rest)
 		 			  		  | _ -> (raise UnifyError))
 		 | ECons (a,b) -> (match t with
 	 					   | EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
 	 			  		                | IncludeVarError -> (raise UnifyError))
+	 					   | ECons (_,_) -> unify ((collect_constraints s t)@rest)
 	 			  		   | _ -> (raise UnifyError))
 		 | ENil -> (match t with
 	 				| EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
 	 			  		         | IncludeVarError -> (raise UnifyError))
+	 				| ENil -> unify ((collect_constraints s t)@rest)
 	 			  	| _ -> (raise UnifyError))
 		 | EConst c -> (match t with
 	 				    | EVar y -> (try (let _ = include_var y s in compose (unify (constraints_subst [y,s] rest)) [y,s]) with
 	 			  		             | IncludeVarError -> (raise UnifyError))
+	 				    | EConst _ -> unify ((collect_constraints s t)@rest)
 	 			  	    | _ -> (raise UnifyError)))
 
 (*  make next state
@@ -146,7 +150,7 @@ let rec search rules queue =
 	(*print_rules rules;*)
 	match queue with 
 	| [] -> (false,[],rules,[],false)
-	| state::rest -> (*print_state state;*)
+	| state::rest -> (* print_state state;print_string "\n";*)
 		(match state with
 		 | ([],sigma) -> (true,sigma,rules,rest,true)
 		 | _ -> let nexts = List.concat (List.map (fun x -> (next x state)) rules) in

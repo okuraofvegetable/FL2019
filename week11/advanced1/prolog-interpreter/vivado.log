@@ -1,0 +1,320 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:36:41 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jul 11 14:23:10 2019
+# Process ID: 18588
+# Current directory: /home/tansei/UTokyo/FL2019/week11/advanced1/prolog-interpreter
+# Command line: vivado
+# Log file: /home/tansei/UTokyo/FL2019/week11/advanced1/prolog-interpreter/vivado.log
+# Journal file: /home/tansei/UTokyo/FL2019/week11/advanced1/prolog-interpreter/vivado.jou
+#-----------------------------------------------------------
+Sourcing tcl script '/home/tansei/.Xilinx/Vivado/Vivado_init.tcl'
+start_gui
+open_project /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.xpr
+INFO: [Project 1-313] Project file moved from '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive/eval_datamover_axi' since last save.
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/opt/Xilinx/Vivado/2018.3/data/ip'.
+update_compile_order -fileset sources_1
+update_module_reference design_1_datamover_axi_wrap_0_0
+INFO: [IP_Flow 19-5107] Inferred bus interface 'axi' of definition 'xilinx.com:interface:aximm:1.0' (from Xilinx Repository).
+INFO: [IP_Flow 19-5107] Inferred bus interface 'rstn' of definition 'xilinx.com:signal:reset:1.0' (from Xilinx Repository).
+INFO: [IP_Flow 19-5107] Inferred bus interface 'clk' of definition 'xilinx.com:signal:clock:1.0' (from Xilinx Repository).
+INFO: [IP_Flow 19-4728] Bus Interface 'rstn': Added interface parameter 'POLARITY' with value 'ACTIVE_LOW'.
+INFO: [IP_Flow 19-4728] Bus Interface 'clk': Added interface parameter 'ASSOCIATED_BUSIF' with value 'axi'.
+INFO: [IP_Flow 19-4728] Bus Interface 'clk': Added interface parameter 'ASSOCIATED_RESET' with value 'rstn'.
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+Adding cell -- xilinx.com:ip:xlconcat:2.1 - xlconcat_0
+Adding cell -- xilinx.com:ip:xlslice:1.0 - xlslice_0
+Adding cell -- xilinx.com:ip:xlslice:1.0 - xlslice_1
+Adding cell -- xilinx.com:ip:axi_bram_ctrl:4.1 - axi_bram_ctrl_0
+Adding cell -- xilinx.com:ip:axi_protocol_checker:2.0 - axi_protocol_checker_0
+Adding cell -- xilinx.com:ip:blk_mem_gen:8.4 - blk_mem_gen_0
+Adding cell -- xilinx.com:ip:blk_mem_gen:8.4 - blk_mem_gen_1
+Adding cell -- xilinx.com:ip:c_counter_binary:12.0 - c_counter_binary_0
+Adding cell -- xilinx.com:ip:c_shift_ram:12.0 - c_shift_ram_0
+Adding cell -- xilinx.com:ip:c_shift_ram:12.0 - c_shift_ram_1
+Adding cell -- xilinx.com:ip:sim_clk_gen:1.0 - sim_clk_gen_0
+Adding cell -- xilinx.com:ip:util_reduced_logic:2.0 - util_reduced_logic_0
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_0
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_1
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_2
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_3
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_4
+Adding cell -- xilinx.com:ip:xlconstant:1.1 - xlconstant_5
+Adding cell -- user.org:module_ref:datamover_axi_wrap:1.0 - datamover_axi_wrap_0
+WARNING: [BD 41-1731] Type mismatch between connected pins: /datamover_axi_wrap_0/data_rdy(undef) and /c_counter_binary_0/CE(ce)
+Successfully read diagram <design_1> from BD file </home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd>
+Upgrading '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd'
+INFO: [IP_Flow 19-1972] Upgraded design_1_datamover_axi_wrap_0_0 from datamover_axi_wrap_v1_0 1.0 to datamover_axi_wrap_v1_0 1.0
+WARNING: [BD 41-1731] Type mismatch between connected pins: /c_counter_binary_0/CE(ce) and /datamover_axi_wrap_0_upgraded_ipi/data_rdy(undef)
+Wrote  : </home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd> 
+upgrade_ip: Time (s): cpu = 00:00:14 ; elapsed = 00:00:09 . Memory (MB): peak = 6584.984 ; gain = 0.000 ; free physical = 7623 ; free virtual = 28175
+update_module_reference: Time (s): cpu = 00:00:15 ; elapsed = 00:00:09 . Memory (MB): peak = 6584.984 ; gain = 0.000 ; free physical = 7623 ; free virtual = 28175
+generate_target Simulation [get_files /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd]
+WARNING: [BD 41-721] Attempt to set value '0' on disabled parameter 'ID_WIDTH' of cell '/axi_bram_ctrl_0' is ignored
+WARNING: [BD 41-2180] Resetting the memory initialization file of </blk_mem_gen_1> to default.
+WARNING: [BD 41-2180] Resetting the memory initialization file of </blk_mem_gen_0> to default.
+WARNING: [xilinx.com:ip:axi_bram_ctrl:4.1-1] /axi_bram_ctrl_0: PORT /axi_bram_ctrl_0/BRAM_PORTA is UNCONNECTED in the design. Leaving the BRAM interface unconnected will cause BRAMs not to be initialized by Data2Mem
+INFO: [xilinx.com:ip:c_shift_ram:12.0-913] /c_shift_ram_0 Width has been set to manual on the GUI. It will not be updated during validation with a propagated value.
+INFO: [xilinx.com:ip:c_shift_ram:12.0-913] /c_shift_ram_1 Width has been set to manual on the GUI. It will not be updated during validation with a propagated value.
+WARNING: [BD 41-927] Following properties on pin /datamover_axi_wrap_0/clk have been updated from connected ip. They may not be synchronized with cell properties. You can set property on pin directly to confirm the value and resolve the warning.
+	CLK_DOMAIN=design_1_sim_clk_gen_0_0_clk 
+Wrote  : </home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd> 
+VHDL Output written to : /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/synth/design_1.v
+VHDL Output written to : /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/sim/design_1.v
+VHDL Output written to : /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/hdl/design_1_wrapper.v
+INFO: [BD 41-1029] Generation completed for the IP Integrator block datamover_axi_wrap_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block blk_mem_gen_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block c_shift_ram_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconstant_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconstant_1 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block sim_clk_gen_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconstant_2 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block c_shift_ram_1 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block axi_protocol_checker_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block axi_bram_ctrl_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block blk_mem_gen_1 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlslice_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block c_counter_binary_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block util_reduced_logic_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconstant_3 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconcat_0 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlslice_1 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconstant_4 .
+INFO: [BD 41-1029] Generation completed for the IP Integrator block xlconstant_5 .
+Exporting to file /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/hw_handoff/design_1.hwh
+Generated Block Design Tcl file /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/hw_handoff/design_1_bd.tcl
+Generated Hardware Definition File /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/synth/design_1.hwdef
+export_ip_user_files -of_objects [get_files /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd] -no_script -sync -force -quiet
+export_simulation -of_objects [get_files /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/design_1.bd] -directory /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/sim_scripts -ip_user_files_dir /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files -ipstatic_source_dir /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/ipstatic -lib_map_path [list {modelsim=/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.cache/compile_simlib/modelsim} {questa=/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.cache/compile_simlib/questa} {ies=/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.cache/compile_simlib/ies} {xcelium=/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.cache/compile_simlib/xcelium} {vcs=/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.cache/compile_simlib/vcs} {riviera=/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.cache/compile_simlib/riviera}] -use_ip_compiled_libs -force -quiet
+launch_simulation
+INFO: [Vivado 12-5682] Launching behavioral simulation in '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim'
+INFO: [Vivado 12-4795] Using compiled simulation libraries for IPs
+INFO: [SIM-utils-51] Simulation object is 'sim_1'
+INFO: [USF-XSim-7] Finding pre-compiled libraries...
+INFO: [USF-XSim-11] File '/opt/Xilinx/Vivado/2018.3/data/xsim/xsim.ini' copied to run dir:'/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim'
+INFO: [SIM-utils-54] Inspecting design source files for 'design_1_wrapper' in fileset 'sim_1'...
+INFO: [SIM-utils-43] Exported '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim/design_1_blk_mem_gen_0_0.mif'
+INFO: [SIM-utils-43] Exported '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim/datamover_axi.coe'
+INFO: [SIM-utils-43] Exported '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim/design_1_blk_mem_gen_1_0.mif'
+INFO: [SIM-utils-43] Exported '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim/datamover_data.coe'
+INFO: [USF-XSim-97] Finding global include files...
+INFO: [USF-XSim-98] Fetching design files from 'sim_1'...
+INFO: [USF-XSim-2] XSim::Compile design
+INFO: [USF-XSim-61] Executing 'COMPILE and ANALYZE' step in '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim'
+xvlog --incr --relax -L smartconnect_v1_0 -L axi_protocol_checker_v2_0_4 -prj design_1_wrapper_vlog.prj
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/datamover_axi.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module datamover_axi
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/datamover_axi_wrap.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module datamover_axi_wrap
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_datamover_axi_wrap_0_0/sim/design_1_datamover_axi_wrap_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_datamover_axi_wrap_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_blk_mem_gen_0_0/sim/design_1_blk_mem_gen_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_blk_mem_gen_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconstant_0_0/sim/design_1_xlconstant_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconstant_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconstant_1_0/sim/design_1_xlconstant_1_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconstant_1_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_sim_clk_gen_0_0/sim/design_1_sim_clk_gen_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_sim_clk_gen_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconstant_2_0/sim/design_1_xlconstant_2_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconstant_2_0
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_axi_protocol_checker_0_0/sim/design_1_axi_protocol_checker_0_0.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_axi_protocol_checker_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_blk_mem_gen_1_0/sim/design_1_blk_mem_gen_1_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_blk_mem_gen_1_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlslice_0_0/sim/design_1_xlslice_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlslice_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_util_reduced_logic_0_0/sim/design_1_util_reduced_logic_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_util_reduced_logic_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconstant_3_0/sim/design_1_xlconstant_3_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconstant_3_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconcat_0_0/sim/design_1_xlconcat_0_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconcat_0_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlslice_1_0/sim/design_1_xlslice_1_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlslice_1_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconstant_4_0/sim/design_1_xlconstant_4_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconstant_4_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_xlconstant_5_0/sim/design_1_xlconstant_5_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_xlconstant_5_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/sim/design_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.srcs/sources_1/bd/design_1/hdl/design_1_wrapper.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module design_1_wrapper
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl
+xvhdl --incr --relax -prj design_1_wrapper_vhdl.prj
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_c_shift_ram_0_0/sim/design_1_c_shift_ram_0_0.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'design_1_c_shift_ram_0_0'
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_c_shift_ram_0_1/sim/design_1_c_shift_ram_0_1.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'design_1_c_shift_ram_0_1'
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_axi_bram_ctrl_0_0/sim/design_1_axi_bram_ctrl_0_0.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'design_1_axi_bram_ctrl_0_0'
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.ip_user_files/bd/design_1/ip/design_1_c_counter_binary_0_0/sim/design_1_c_counter_binary_0_0.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'design_1_c_counter_binary_0_0'
+INFO: [USF-XSim-69] 'compile' step finished in '3' seconds
+INFO: [USF-XSim-3] XSim::Elaborate design
+INFO: [USF-XSim-61] Executing 'ELABORATE' step in '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim'
+Vivado Simulator 2018.3
+Copyright 1986-1999, 2001-2018 Xilinx, Inc. All Rights Reserved.
+Running: /opt/Xilinx/Vivado/2018.3/bin/unwrapped/lnx64.o/xelab -wto 94a3f5c8c5e04a9189a68ba1c84de9fb --incr --debug typical --relax --mt 8 -L xil_defaultlib -L blk_mem_gen_v8_4_2 -L xbip_utils_v3_0_9 -L c_reg_fd_v12_0_5 -L c_mux_bit_v12_0_5 -L c_shift_ram_v12_0_12 -L xlconstant_v1_1_5 -L sim_clk_gen_v1_0_2 -L smartconnect_v1_0 -L axi_protocol_checker_v2_0_4 -L blk_mem_gen_v8_3_6 -L axi_bram_ctrl_v4_1_0 -L xlslice_v1_0_1 -L xbip_dsp48_wrapper_v3_0_4 -L xbip_pipe_v3_0_5 -L xbip_dsp48_addsub_v3_0_5 -L xbip_addsub_v3_0_5 -L c_addsub_v12_0_12 -L c_gate_bit_v12_0_5 -L xbip_counter_v3_0_5 -L c_counter_binary_v12_0_12 -L util_reduced_logic_v2_0_4 -L xlconcat_v2_1_1 -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot design_1_wrapper_behav xil_defaultlib.design_1_wrapper xil_defaultlib.glbl -log elaborate.log 
+Using 8 slave threads.
+Starting static elaboration
+Completed static elaboration
+Starting simulation data flow analysis
+WARNING: [XSIM 43-4099] "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/datamover_axi_wrap.v" Line 3. Module datamover_axi_wrap doesn't have a timescale but at least one module in design has a timescale.
+WARNING: [XSIM 43-4099] "/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/datamover_axi.sv" Line 3. Module datamover_axi doesn't have a timescale but at least one module in design has a timescale.
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package std.standard
+Compiling package std.textio
+Compiling package ieee.std_logic_1164
+Compiling package ieee.numeric_std
+Compiling package ieee.std_logic_arith
+Compiling package xpm.vcomponents
+Compiling package axi_bram_ctrl_v4_1_0.axi_bram_ctrl_funcs
+Compiling package c_counter_binary_v12_0_12.c_counter_binary_v12_0_12_viv_co...
+Compiling package xbip_utils_v3_0_9.xbip_utils_v3_0_9_pkg
+Compiling package xbip_counter_v3_0_5.xbip_counter_v3_0_5_viv_comp
+Compiling package ieee.std_logic_unsigned
+Compiling package xbip_counter_v3_0_5.xbip_counter_v3_0_5_pkg
+Compiling package c_counter_binary_v12_0_12.c_counter_binary_v12_0_12_pkg
+Compiling package c_addsub_v12_0_12.c_addsub_v12_0_12_pkg_legacy
+Compiling package c_reg_fd_v12_0_5.c_reg_fd_v12_0_5_viv_comp
+Compiling package c_addsub_v12_0_12.c_addsub_v12_0_12_pkg
+Compiling package unisim.vcomponents
+Compiling package c_shift_ram_v12_0_12.c_shift_ram_v12_0_12_viv_comp
+Compiling package c_shift_ram_v12_0_12.c_shift_ram_v12_0_12_pkg
+Compiling package c_mux_bit_v12_0_5.c_mux_bit_v12_0_5_viv_comp
+Compiling package smartconnect_v1_0.sc_util_v1_0_4_pkg
+Compiling architecture implementation of entity axi_bram_ctrl_v4_1_0.axi_lite [\axi_lite(c_s_axi_addr_width=14,...]
+Compiling architecture implementation of entity axi_bram_ctrl_v4_1_0.axi_bram_ctrl_top [\axi_bram_ctrl_top(c_s_axi_addr_...]
+Compiling architecture implementation of entity axi_bram_ctrl_v4_1_0.axi_bram_ctrl [\axi_bram_ctrl(c_s_axi_addr_widt...]
+Compiling architecture design_1_axi_bram_ctrl_0_0_arch of entity xil_defaultlib.design_1_axi_bram_ctrl_0_0 [design_1_axi_bram_ctrl_0_0_defau...]
+Compiling module smartconnect_v1_0.sc_util_v1_0_4_onehot_to_binary(...
+Compiling module smartconnect_v1_0.sc_util_v1_0_4_srl_rtl(C_A_WIDTH...
+Compiling module smartconnect_v1_0.sc_util_v1_0_4_axic_reg_srl_fifo...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_thre...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_syn_...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_axi4...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_axi4...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_syn_...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_syn_...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_core...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_repo...
+Compiling module axi_protocol_checker_v2_0_4.axi_protocol_checker_v2_0_4_top(...
+Compiling module xil_defaultlib.design_1_axi_protocol_checker_0_...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2_output_stage(...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2_softecc_outpu...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2_mem_module(C_...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2(C_FAMILY="art...
+Compiling module xil_defaultlib.design_1_blk_mem_gen_0_0
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2_output_stage(...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2_softecc_outpu...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2_mem_module(C_...
+Compiling module blk_mem_gen_v8_4_2.blk_mem_gen_v8_4_2(C_FAMILY="art...
+Compiling module xil_defaultlib.design_1_blk_mem_gen_1_0
+Compiling architecture structural of entity c_reg_fd_v12_0_5.c_reg_fd_v12_0_5_viv [\c_reg_fd_v12_0_5_viv(c_width=8,...]
+Compiling architecture muxcy_v of entity unisim.MUXCY [muxcy_default]
+Compiling architecture xorcy_v of entity unisim.XORCY [xorcy_default]
+Compiling architecture rtl of entity c_addsub_v12_0_12.c_addsub_v12_0_12_lut6_legacy [\c_addsub_v12_0_12_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_12.c_addsub_v12_0_12_fabric_legacy [\c_addsub_v12_0_12_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_12.c_addsub_v12_0_12_legacy [\c_addsub_v12_0_12_legacy(c_fami...]
+Compiling architecture synth of entity c_counter_binary_v12_0_12.c_counter_binary_v12_0_12_legacy [\c_counter_binary_v12_0_12_legac...]
+Compiling architecture synth of entity c_counter_binary_v12_0_12.c_counter_binary_v12_0_12_viv [\c_counter_binary_v12_0_12_viv(c...]
+Compiling architecture xilinx of entity c_counter_binary_v12_0_12.c_counter_binary_v12_0_12 [\c_counter_binary_v12_0_12(c_xde...]
+Compiling architecture design_1_c_counter_binary_0_0_arch of entity xil_defaultlib.design_1_c_counter_binary_0_0 [design_1_c_counter_binary_0_0_de...]
+Compiling architecture structural of entity c_reg_fd_v12_0_5.c_reg_fd_v12_0_5_viv [\c_reg_fd_v12_0_5_viv(c_ainit_va...]
+Compiling architecture struct of entity c_shift_ram_v12_0_12.c_shift_ram_v12_0_12_legacy [\c_shift_ram_v12_0_12_legacy(c_x...]
+Compiling architecture synth of entity c_shift_ram_v12_0_12.c_shift_ram_v12_0_12_viv [\c_shift_ram_v12_0_12_viv(c_xdev...]
+Compiling architecture xilinx of entity c_shift_ram_v12_0_12.c_shift_ram_v12_0_12 [\c_shift_ram_v12_0_12(c_xdevicef...]
+Compiling architecture design_1_c_shift_ram_0_0_arch of entity xil_defaultlib.design_1_c_shift_ram_0_0 [design_1_c_shift_ram_0_0_default]
+Compiling architecture struct of entity c_shift_ram_v12_0_12.c_shift_ram_v12_0_12_legacy [\c_shift_ram_v12_0_12_legacy(c_x...]
+Compiling architecture synth of entity c_shift_ram_v12_0_12.c_shift_ram_v12_0_12_viv [\c_shift_ram_v12_0_12_viv(c_xdev...]
+Compiling architecture xilinx of entity c_shift_ram_v12_0_12.c_shift_ram_v12_0_12 [\c_shift_ram_v12_0_12(c_xdevicef...]
+Compiling architecture design_1_c_shift_ram_0_1_arch of entity xil_defaultlib.design_1_c_shift_ram_0_1 [design_1_c_shift_ram_0_1_default]
+Compiling module xil_defaultlib.datamover_axi
+Compiling module xil_defaultlib.datamover_axi_wrap
+Compiling module xil_defaultlib.design_1_datamover_axi_wrap_0_0
+Compiling module xil_defaultlib.sim_clk_gen(CLOCK_PERIOD=10,INIT...
+Compiling module xil_defaultlib.design_1_sim_clk_gen_0_0
+Compiling module util_reduced_logic_v2_0_4.util_reduced_logic_v2_0_4_util_r...
+Compiling module xil_defaultlib.design_1_util_reduced_logic_0_0
+Compiling module xlconcat_v2_1_1.xlconcat_v2_1_1_xlconcat(IN0_WID...
+Compiling module xil_defaultlib.design_1_xlconcat_0_0
+Compiling module xlconstant_v1_1_5.xlconstant_v1_1_5_xlconstant(CON...
+Compiling module xil_defaultlib.design_1_xlconstant_0_0
+Compiling module xlconstant_v1_1_5.xlconstant_v1_1_5_xlconstant(CON...
+Compiling module xil_defaultlib.design_1_xlconstant_1_0
+Compiling module xil_defaultlib.design_1_xlconstant_2_0
+Compiling module xlconstant_v1_1_5.xlconstant_v1_1_5_xlconstant(CON...
+Compiling module xil_defaultlib.design_1_xlconstant_3_0
+Compiling module xlconstant_v1_1_5.xlconstant_v1_1_5_xlconstant(CON...
+Compiling module xil_defaultlib.design_1_xlconstant_4_0
+Compiling module xil_defaultlib.design_1_xlconstant_5_0
+Compiling module xlslice_v1_0_1.xlslice_v1_0_1_xlslice(DIN_WIDTH...
+Compiling module xil_defaultlib.design_1_xlslice_0_0
+Compiling module xlslice_v1_0_1.xlslice_v1_0_1_xlslice(DIN_FROM=...
+Compiling module xil_defaultlib.design_1_xlslice_1_0
+Compiling module xil_defaultlib.design_1
+Compiling module xil_defaultlib.design_1_wrapper
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot design_1_wrapper_behav
+run_program: Time (s): cpu = 00:00:06 ; elapsed = 00:00:05 . Memory (MB): peak = 6818.457 ; gain = 0.000 ; free physical = 7710 ; free virtual = 28255
+INFO: [USF-XSim-69] 'elaborate' step finished in '5' seconds
+INFO: [USF-XSim-4] XSim::Simulate design
+INFO: [USF-XSim-61] Executing 'SIMULATE' step in '/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/eval_datamover_axi.sim/sim_1/behav/xsim'
+INFO: [USF-XSim-98] *** Running xsim
+   with args "design_1_wrapper_behav -key {Behavioral:sim_1:Functional:design_1_wrapper} -tclbatch {design_1_wrapper.tcl} -protoinst "protoinst_files/design_1.protoinst" -view {/home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/design_1_wrapper_behav.wcfg} -log {simulate.log}"
+INFO: [USF-XSim-8] Loading simulator feature
+Vivado Simulator 2018.3
+INFO: [Wavedata 42-565] Reading protoinst file protoinst_files/design_1.protoinst
+INFO: [Wavedata 42-564]   Found protocol instance at /design_1_wrapper/design_1_i//axi_bram_ctrl_0/S_AXI
+INFO: [Wavedata 42-564]   Found protocol instance at /design_1_wrapper/design_1_i//axi_protocol_checker_0/PC_AXI
+INFO: [Wavedata 42-564]   Found protocol instance at /design_1_wrapper/design_1_i//datamover_axi_wrap_0/axi
+Time resolution is 1 ps
+open_wave_config /home/tansei/Hardware/kadai0704/axi_archive-2019/axi_archive_fast/eval_datamover_axi/design_1_wrapper_behav.wcfg
+WARNING: Simulation object /design_1_wrapper/design_1_i/datamover_axi_wrap_0/inst/u1/instr_reg was not found in the design.
+source design_1_wrapper.tcl
+# set curr_wave [current_wave_config]
+# if { [string length $curr_wave] == 0 } {
+#   if { [llength [get_objects]] > 0} {
+#     add_wave /
+#     set_property needs_save false [current_wave_config]
+#   } else {
+#      send_msg_id Add_Wave-1 WARNING "No top level signals found. Simulator will start without a wave window. If you want to open a wave window go to 'File->New Waveform Configuration' or type 'create_wave_config' in the TCL console."
+#   }
+# }
+# run 1000ns
+ Block Memory Generator module loading initial data...
+ Block Memory Generator data initialization complete.
+Block Memory Generator module design_1_wrapper.design_1_i.blk_mem_gen_0.inst.native_mem_module.blk_mem_gen_v8_4_2_inst is using a behavioral model for simulation which will not precisely model memory collision behavior.
+ Block Memory Generator module loading initial data...
+ Block Memory Generator data initialization complete.
+Block Memory Generator module design_1_wrapper.design_1_i.blk_mem_gen_1.inst.native_mem_module.blk_mem_gen_v8_4_2_inst is using a behavioral model for simulation which will not precisely model memory collision behavior.
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 25 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 35 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 45 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 55 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 65 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 75 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+Warning: AXI_ERRM_RREADY_X: When not in reset, a value of X on RREADY is not permitted. Spec: section A3.1.2.
+Time: 85 ns  Iteration: 2  Process: /design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP//design_1_wrapper/design_1_i/axi_protocol_checker_0/inst/REP/axi4_errm_rready_x  File: /wrk/2018.3/nightly/2018_12_06_2405991/packages/customer/vivado/data/ip/xilinx/axi_protocol_checker_v2_0/hdl/axi_protocol_checker_v2_0_vl_rfs.sv
+INFO: [USF-XSim-96] XSim completed. Design snapshot 'design_1_wrapper_behav' loaded.
+INFO: [USF-XSim-97] XSim simulation ran for 1000ns
+launch_simulation: Time (s): cpu = 00:00:16 ; elapsed = 00:00:13 . Memory (MB): peak = 6818.457 ; gain = 0.000 ; free physical = 7473 ; free virtual = 28033
+close_sim
+INFO: [Simtcl 6-16] Simulation closed
+exit
+INFO: [Common 17-206] Exiting Vivado at Thu Jul 11 14:42:22 2019...

@@ -68,7 +68,18 @@ atomic:
   | list   { $1 }
 ;
 
+atomics:
+  | list_last { $1 }
+  | atomic COMMA atomics { ECons($1,$3) } 
+;
+
+list_last:
+  | atomic { ECons($1,ENil) }
+  | atomic BAR atomic { ECons($1,$3) }
+;
+
 list:
   | NIL { ENil }
-  | LBRACKET atomic BAR atomic RBRACKET { ECons($2,$4) }
+  | LBRACKET atomics RBRACKET { $2 }
 ;
+

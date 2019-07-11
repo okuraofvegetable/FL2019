@@ -14,3 +14,24 @@ rule test :- q(X,X).
 rule q(X,f(X)).
 query test.
 query q(X,X).
+
+rule append([],Y,Y).
+rule append([A|X],Y,[A|Z]) :- append(X,Y,Z).
+rule concat([X|[]],X).
+rule concat([X|Y],Z) :- concat(Y,W),append(X,W,Z).
+
+query append([1|[2|[3|[]]]],[4|[5|[]]],Z).
+query append(X,Y,[1|[2|[3|[4|[5|[]]]]]]).
+query concat([[1],[2,3,4]] ,X).
+
+
+rule in(X,[X|Y]).
+rule in(X,[Y|Z]) :- in(X,Z).
+rule choose([X|Y],Y,X).
+rule choose([A|X],[A|Y],Z) :- choose(X,Y,Z).
+rule hamilton(V,E) :- choose(V,Rem,Start),hamiltonsub(Rem,E,Start).
+rule hamiltonsub([],X,Y).
+rule hamiltonsub(V,E,Now) :- choose(V,Rem,Next),in([Now|[Next|[]]],E),hamiltonsub(Rem,E,Next).
+
+query hamilton([1,2,3,4],[[1,2],[2,3],[3,4],[4,1]]).
+
