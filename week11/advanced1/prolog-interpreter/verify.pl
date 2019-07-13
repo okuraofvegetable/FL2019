@@ -1,5 +1,6 @@
 rule nat(z).
 rule nat(s(X)) :- nat(X).
+query nat(X).
 
 rule male(koji).
 rule parent(kobo,koji).
@@ -20,8 +21,8 @@ rule append([A|X],Y,[A|Z]) :- append(X,Y,Z).
 rule concat([X|[]],X).
 rule concat([X|Y],Z) :- concat(Y,W),append(X,W,Z).
 
-query append([1|[2|[3|[]]]],[4|[5|[]]],Z).
-query append(X,Y,[1|[2|[3|[4|[5|[]]]]]]).
+query append([1,2,3],[4,5],Z).
+query append(X,Y,[1,2,3,4,5]).
 query concat([[1],[2,3,4]] ,X).
 
 

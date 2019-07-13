@@ -108,11 +108,7 @@ let rec print_term t =
                        if tl=[] then ()
                                 else (print_string "(";print_term_list tl;print_string ")")
   | EVar id -> print_name id
-  | ECons (x,y) -> print_string "[";
-                   print_term x;
-                   print_string " | ";
-                   print_term y;
-                   print_string "]"
+  | ECons (x,y) -> print_list t
   | ENil -> print_string "[]"
   | EConst x -> print_name x 
 and print_term_list tl = 
@@ -122,6 +118,16 @@ and print_term_list tl =
                (if (rest <> []) then (print_string ",") 
                                 else ());
                print_term_list rest
+and print_list t =
+  print_string "[";
+  print_list_inner t;
+  print_string "]"
+and print_list_inner t =
+  match t with
+  | ECons (x,(ECons(y,z))) -> print_term x;print_string ", ";print_list_inner (ECons (y,z))
+  | ECons (x,ENil) -> print_term x
+  | ECons (x,y) -> print_term x;print_string " | ";print_term y
+  | _ -> () (* Error *)
 
 let rec print_fact fac =
   match fac with

@@ -156,12 +156,23 @@ let rec search rules queue =
 		 | _ -> let nexts = List.concat (List.map (fun x -> (next x state)) rules) in
 		 		(search rules (rest@nexts)))
 
+exception UndefinedProcedure
+let rec exist_predict f rules =
+	match rules with
+	| [] -> (raise UndefinedProcedure)
+	| (r,_)::rest -> (match (f,r) with
+				  | (EPdSymb (x,_),EPdSymb (y,_)) -> if (x=y) then true
+				  									 else (exist_predict f rest))
+let check_query q rules = 
+	let _ = List.map (fun s -> exist_predict s rules) q in ()  
+
 (* let rules = [(EPdSymb ("male",[EFnSymb ("koji",[])]));(EPdSymb ("parent",[EFnSymb ("kobo",[]);EFnSymb ("koji",[])]))] *)
 
 let rec eval_command cmd rules queue table = 
 	match cmd with
 	| CRule r -> (true,[],r::rules,[],[],false,true)
-	| CQuery q -> let newtable = add_env (get_vars_fact_list q) in
+	| CQuery q -> let _ = check_query q rules in
+				  let newtable = add_env (get_vars_fact_list q) in
 				  let sigma = List.map (fun (x,y) -> (y,x)) newtable in
 				  let gl = convert_fact_list q sigma in
 				  let (result,sigma,newrules,nque,in_progress) = search rules [(gl,[])] in
