@@ -136,6 +136,8 @@ let count_edge board color =
       if board.(8).(i) = color then cnt := !cnt +1;
     done;
     !cnt
+let f board color = 
+  (count_corner board color)*10+(count_edge board color)+(List.length (valid_moves board color))
 
 
 let eval_board mycolor color board mode = 
@@ -144,8 +146,7 @@ let eval_board mycolor color board mode =
     (let value = ((count board mycolor) - (count board (opposite_color mycolor))) in
     if (color = mycolor) then value else (-value))
   | Middle ->
-    (let value = ((count_corner board mycolor)*10 + (count_edge board mycolor)*5)
-                 - ((count_corner board (opposite_color mycolor))*10 + (count_edge board (opposite_color mycolor))*5) in
+    (let value = (f board mycolor) - (f board (opposite_color mycolor)) in
     if (color = mycolor) then value else (-value))
 
 
@@ -202,11 +203,11 @@ let play board color =
   let ms = valid_moves board color in
   if ms = [] then
     Pass
-  else if (count board none) <= 11 then
-    let (_,com) = get_optimal_negamax 13 board color color 100 Last in
+  else if (count board none) <= 9 then
+    let (_,com) = get_optimal_negamax 10 board color color 100 Last in
     com
-  else if (count board none) <= 50 then
-    let (_,com) = get_optimal_negamax 5 board color color 100 Middle in
+  else if (count board none) <= 64 then
+    let (_,com) = get_optimal_negamax 4 board color color 100 Middle in
     com
 	else
       let k = Random.int (List.length ms) in
