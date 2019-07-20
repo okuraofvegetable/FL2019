@@ -1,7 +1,7 @@
 open Array
 open Color
 open Command
-
+open Bitboard
 
 type board = color array array
 
@@ -162,7 +162,7 @@ let rec negamax_rec (value,mv) com_list depth board mycolor color limit mode =
 and get_optimal_negamax depth board mycolor color limit mode =
   (*print_string "debug-------------------\n";
   print_board board;*)
-  if ((depth = 0) || ((count board none) = 0)) then
+  if ((depth = 0) || ((count_empty board) = 0)) then
     let (v,m) = ((eval_board mycolor color board mode),Pass) in
     (*print_string "\ndebug-------------------\n";
     print_board board;
@@ -200,24 +200,20 @@ and get_optimal_negamax depth board mycolor color limit mode =
 
 
 let play board color =
+  let bb = convert_bitboard board color in
   let ms = valid_moves board color in
   if ms = [] then
     Pass
-  else if (count board none) <= 9 then
-    let (_,com) = get_optimal_negamax 10 board color color 100 Last in
+  else if (count_empty bb) <= 9 then
+    let (_,com) = get_optimal_negamax 10 bb color color 1000 Last in
     com
-  else if (count board none) <= 64 then
-    let (_,com) = get_optimal_negamax 4 board color color 100 Middle in
+  else if (count_empty bb) <= 64 then
+    let (_,com) = get_optimal_negamax 4 bb color color 1000 Middle in
     com
 	else
       let k = Random.int (List.length ms) in
       let (i,j) = List.nth ms k in
 	Mv (i,j)
-
-
-
-
-
 
 
 let report_result board =

@@ -1,4 +1,4 @@
-open Color
+(*open Color*)
 
 type wl   = Win | Lose | Tie
 type move = Mv of int * int | Pass | GiveUp

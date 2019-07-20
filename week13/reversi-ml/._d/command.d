@@ -1,2 +1,2 @@
-command.cmo : color.cmo
-command.cmx : color.cmx
+command.cmo :
+command.cmx :
