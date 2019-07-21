@@ -36,3 +36,8 @@ rule hamiltonsub(V,E,Now) :- choose(V,Rem,Next),in([Now|[Next|[]]],E),hamiltonsu
 
 query hamilton([1,2,3,4],[[1,2],[2,3],[3,4],[4,1]]).
 
+rule eq(a,b).
+rule eq(c,b).
+rule eq(X,Z) :- eq(X,Y),eq(Y,Z).
+rule eq(X,Y) :- eq(Y,X).
+query eq(a,c).

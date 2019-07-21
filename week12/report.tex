@@ -29,7 +29,13 @@
 \section*{問1}
 \subsection*{動作例}
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- ['problem1.pl'].
+true.
+
+?- eq(a,c).
+ERROR: Out of local stack
 \end{lstlisting}
+\subsection*{考察}
 仮定に以下のように番号をふることにする。
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
 1. eq(a,b).
@@ -45,21 +51,75 @@
 	\item $4. \forall X \forall Y eq(Y,X) \rightarrow eq(X,Y)$
 \end{itemize}
 仮定2より$eq(c,b)$,これと仮定4で$X=c,Y=b$としたものから、$eq(b,c)$。仮定1よりeq(a,b)であるから$eq(a,b)\land eq(b,c)$。これと仮定3で$X=a,Y=b,Z=c$としたものより$eq(a,c)$よって$eq(a,c)$はtrueである。\par
-Prologは番号の若いルールを優先して深さ優先探索によってSLD導出を探索する。よって探索は以下の画像のようにす進み、無限ループし、処理系に実際に問い合わせるとスタックオーバーフローした。論理的解釈と一致させるには、処理系の探索方法を幅優先探索にすればよい。実際発展2の処理系ではtrue.が表示される。
+Prologは番号の若いルールを優先して深さ優先探索によってSLD導出を探索する。よって探索は以下の画像のように進み、無限ループし、処理系に実際に問い合わせるとスタックオーバーフローした。論理的解釈と一致させるには、処理系の探索方法を幅優先探索にすればよい。実際発展2の処理系ではtrue.が表示される。
 
 \section*{問2}
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- ['problem2.pl'].
+true.
+
+?- test.
+true.
+
+?- q(X,X).
+X = f(X).
 \end{lstlisting}
+\subsection*{考察}
 論理的解釈では、q(X,X)とq(X,f(X))は単一化できないので、falseとなると考えられる。しかし動作例のようにtest.をProlog処理系に問い合わせるとtrueとなる。これは、Prolog処理系が単一化の際に出現検査をしていないからであり、q(X,X)を問い合わせると動作例のようにX=f(X)と出力される。この出現検査の有無が論理的解釈との差異を生んでいる。
 \section*{問3}
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- ['problem3.pl'].
+true.
+
+?- \+p(X),q(X).
+false.
+
+?- q(X),\+p(X).
+X = b.
 \end{lstlisting}
+\subsection*{考察}
 閉世界仮説より、
 $\forall X.(p(X) \leftrightarrow X=a)$,$\forall X.(q(X)\leftrightarrow X=b)$であるから、$\lnot p(b)$はtrueで$q(b)$もtrue,すなわち$\lnot p(b) \land q(b)$がtrueなので$\exists X.(\lnot p(X) \land q(X))$は論理的解釈ではtrueと考えられる。\par
 Prolog処理系で実際に問い合わせると、動作例のようにfalseが帰ってくる。Prolog処理系での否定は導出の失敗による否定で、変数が含まれる場合にもこれが適用される。処理系に問い合わせると、p(X)が導出できるかどうかを探索するが,p(a)がtrueで導出できるのでY\llap=+p(X)はfalseとなる。よってY\llap=+p(X),q(X)もfalseとなる。このように、Prolog処理系は内部に変数を含む項にたいしても失敗による否定を適用することが論理的解釈との差異を生んでいる。\par
-論理的解釈と結果を一致させるためにはPrologがゴールを解決しようとするときにそれに含まれる変数がすべて変数を含まないものに置き換わっているようにすればよいので、問い合わせをq(X),Y\llap=+p(X).に書き換えると、動作例のようにtrue.となる。この場合は探索中にX=bと確定する。
+論理的解釈と結果を一致させるためにはPrologがゴールを解決しようとするときにそれに含まれる変数がすべて変数を含まないものに置き換わっているようにすればよいので、問い合わせをq(X),Y\llap=+p(X).に書き換えると、動作例のようにtrue.となる。この場合は探索中にXはbに置き換わり、ゴールの導出に成功する。\\
 
 \section*{発展1}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- ['advanced1.pl'].
+true.
+
+?- r(a).
+ERROR: Out of global stack
+\end{lstlisting}
+\subsection*{考察}
+論理的解釈では、p(a)はtrueもしくはfalseのどちらかである。p(a)がtrueの場合は仮定1より、falseの場合は仮定2より、いずれの場合もr(a)はtrueとなるので,r(a)がtrueは論理的帰結である。\par
+r(a).を問い合わせると、処理系はルール1よりp(a)の導出を試みる。しかしゴールは$p(a)\rightarrow p(f(a)) \rightarrow p(f(f(a))) \rightarrow p(f(f(f(a)))) \rightarrow ...$となり無限ループする。
+Prologの否定は失敗による否定で、p(a)の導出に成功すればY\llap=+p(a)の導出は失敗し、p(a)の導出に失敗すればY\llap=+p(a)の導出は成功する。しかしp(a)の導出が成功も失敗もせず無限ループした場合、Y\llap=+p(a)の導出は成功も失敗もしない。
+\section*{発展2}
+\subsection*{動作例}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
+?- rule eq(a,b).
+?- rule eq(c,b).
+?- rule eq(X,Z) :- eq(X,Y),eq(Y,Z).
+?- rule eq(X,Y) :- eq(Y,X).
+?- query eq(a,c).
+true.
+----------------------------------------
+?- rule test :- q(X,X).
+?- rule q(X,f(X)).
+?- query test.
+false.
+\end{lstlisting}
+\subsection*{考察}
+基本的には前回の課題の発展1のインタプリタである。否定は実装していない。(採点の担当の方が先週と違う場合を考えてこのレポートの最後の部分に前回の発展1のレポートを引用しております。適宜参照していただけるとありがたいです。)
+以下で論理的に健全で完全であることを説明する。
+Prolog処理系とことなり深さ優先探索ではなく幅優先探索をしており、証明(木)は有限の深さであるから証明が存在するならば、必ず有限時間でそれを発見し報告できる。幅優先探索にすることで自然にルールの優先順位が取り払われている。ここでここまでの方法とSLD導出の定義のスライドと見比べたときに異なる点は"ゴールリストのサブゴールを1つ選ぶ"という点で、先週の処理系ではかならずゴールリストの先頭を選ぶようになっていたのでここが任意に一つ選ばれるように改良した。
+今回の問2で見たように、単一化の際の出現検査をしないと論理的解釈と差異が生じるので、単一化の出現検査をちゃんとやるようにしている。よってSLD導出の健全性、完全性より今回実装したPrologライクな論理型言語は完全かつ健全ある。\par
+動作例では,問1,問2でPrologでは論理的解釈と差異が生じていたものが、今回実装したものでは差異を生じないことが確認できる。
+\newpage
+\hrulefill
+\section*{前回の発展1(前回分レポートより引用)}
 \subsection*{動作例}
 \begin{lstlisting}[basicstyle=\ttfamily\footnotesize, frame=single]
 ?- rule nat(z).

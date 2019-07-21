@@ -21,6 +21,8 @@ type command =
 type subst = (name * term) list
 
 type constraints = (term * term) list
+
+type state = (fact list) * subst
 				  
 let print_name = print_string
 

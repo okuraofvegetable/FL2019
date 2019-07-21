@@ -121,6 +121,19 @@ let rec unify cl =
 	 				    | EConst _ -> unify ((collect_constraints s t)@rest)
 	 			  	    | _ -> (raise UnifyError)))
 
+(* state -> state list *)
+let rec rotate_goal acc state n = 
+	let (gl,sigma) = state in
+	(
+		if (List.length gl = 0) then
+			[state]
+		else if ((List.length gl) = n) then
+			(acc)
+		else
+			(match gl with
+			 | [] -> []
+			 | p::rest -> (rotate_goal (state::acc) ((rest@[p]),sigma) (n+1) )))
+
 (*  make next state
 	rule -> ((fact list) * subst) -> ((fact list) * subst)
 	Goal list of q must not be empty.
@@ -150,11 +163,12 @@ let rec search rules queue =
 	(*print_rules rules;*)
 	match queue with 
 	| [] -> (false,[],rules,[],false)
-	| state::rest -> (* print_state state;print_string "\n";*)
+	| state::rest -> (* print_state state;print_string "\n"; *)
 		(match state with
 		 | ([],sigma) -> (true,sigma,rules,rest,true)
 		 | _ -> let nexts = List.concat (List.map (fun x -> (next x state)) rules) in
-		 		(search rules (rest@nexts)))
+		 		let nexts_rotate = List.concat (List.map (fun s -> (rotate_goal [] s 0)) nexts) in
+		 		(search rules (rest@nexts_rotate)))
 
 exception UndefinedProcedure
 let rec exist_predict f rules =
@@ -175,7 +189,8 @@ let rec eval_command cmd rules queue table =
 				  let newtable = add_env (get_vars_fact_list q) in
 				  let sigma = List.map (fun (x,y) -> (y,x)) newtable in
 				  let gl = convert_fact_list q sigma in
-				  let (result,sigma,newrules,nque,in_progress) = search rules [(gl,[])] in
+				  let intial_queue = rotate_goal [] (gl,[]) 0 in
+				  let (result,sigma,newrules,nque,in_progress) = search rules intial_queue in
 					(result,sigma,newrules,nque,newtable,in_progress,false)
 	| CCont -> let (result,sigma,newrules,nque,in_progress) = search rules queue in
 					(result,sigma,newrules,nque,table,in_progress,false)
