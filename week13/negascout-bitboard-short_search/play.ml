@@ -2,6 +2,7 @@ open Array
 open Color
 open Command
 open Bitboard
+open Hashtbl
 
 exception AssertError of string 
 
@@ -119,7 +120,7 @@ let valid_coms board color =
   | [] -> [Pass]
   | _ -> com_list    
 
-
+let rotate = ref 0
 
 type search_mode = Last | Middle
 
