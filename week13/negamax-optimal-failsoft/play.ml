@@ -154,6 +154,7 @@ let next_valid_move_size board com color =
   let opp = opposite_color color in
   List.length (valid_moves next opp)
 
+
 let counter = ref 0
 
 let max a b =
@@ -214,17 +215,22 @@ and get_optimal_negamax depth board mycolor color alpha beta mode =
 
 
 let play board color =
+  print_string "thinking....\nnumber of nodes in privious search : ";
   print_int !counter;
   print_string "\n";
+  print_board board;
   counter := 0;
   let ms = valid_moves board color in
   if ms = [] then
     Pass
-  else if (count board none) <= 15 then
-    let (_,com) = get_optimal_negamax 15 board color color (-1000) 1000 Last in
+  else if (count board none) <= 9 then
+    let (v,com) = get_optimal_negamax 9 board color color (-1000) 1000 Last in
+    print_string "value : ";
+    print_int v;
+    print_string (("\n"^(string_of_move com))^"\n");
     com
   else if (count board none) <= 64 then
-    let (_,com) = get_optimal_negamax 5 board color color (-1000) 1000 Middle in
+    let (_,com) = get_optimal_negamax 4 board color color (-1000) 1000 Middle in
     com
   else
       let k = Random.int (List.length ms) in
