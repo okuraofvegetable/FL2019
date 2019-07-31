@@ -1,0 +1,59 @@
+\documentclass[11pt,a4paper]{jsarticle}
+%
+\usepackage{amsmath,amssymb}
+\usepackage{bm}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{ascmac}
+\usepackage{listings}
+%
+\setlength{\textwidth}{\fullwidth}
+\setlength{\textheight}{40\baselineskip}
+\addtolength{\textheight}{\topskip}
+\setlength{\voffset}{-0.2in}
+\setlength{\topmargin}{0pt}
+\setlength{\headheight}{0pt}
+\setlength{\headsep}{0pt}
+%
+\newcommand{\divergence}{\mathrm{div}\,}  %ダイバージェンス
+\newcommand{\grad}{\mathrm{grad}\,}  %グラディエント
+\newcommand{\rot}{\mathrm{rot}\,}  %ローテーション
+%
+\title{レポート課題13}
+\author{05-191009 奥村真司}
+\date{}
+\begin{document}
+\maketitle
+%
+%
+\section*{問1}
+\subsection*{実装について}
+OCamlを用いて実装した。
+どのように実装、改善していったかを時系列順に説明する。
+\subsubsection*{とりあえずnegamax}
+min-maxでは先後で交互にmax,minを取るが、盤面の評価値を後手の場合は負にすることで常にmaxを取るように実装でき、実装量が少ない。これはnegamaxと呼ばれており、はじめにこれを実装した。これを実装した段階では中盤4手終盤7手ほどしか読めなかったが、randomに対する勝率はほぼ100\%であった(5回ほど実行したが全て100戦100勝だった)。終盤の盤面評価は(自分の石の数)-(相手の石の数)、中盤の盤面評価は(自分の隅の数$*10+$着手可能数)-(相手の隅の数$*10+$着手可能数)と適当においた。この関数は適当に決めたものであるが、最後まで変わっていない。
+\subsubsection*{negaalpha法への改良}
+negamaxでは一切枝刈りをしないので、枝刈り探索にするためnegaalpha法に改良した。これによって中盤5手,終盤10手ほど読めるようになった。
+\subsubsection*{Bitboardの実装}
+ボードの処理が重いので、bitboardをOCamlのint64を用いて実装した。Bitboardを用いる実装に変えると終盤12手ほど読めるようになった。
+OCamlのint型は63bit符号付き整数型なので、Int64型の0x7f7f7f7f7f7f7f7fという値を作るときに、of\_int 0x7f7f7f7f7f7f7f7fとすると,0x7f7f7f7f7f7f7f7fは符号付き63bit整数では負の数なので、符号拡張されて0xff7f7f7f7f7f7f7fになってしまう。これが原因のバグを治すのに3日もかかってしまった(着手可能数の列挙には影響しないのでInvalid moveをしなかったので)
+\subsubsection*{Move Orderingの工夫}
+nega-alpha法をnega-scoutやMTD(f)法に改良しようと想いいろいろと調べていると、alpha-beta法ではあるノードからどの順で探索するか(Move Ordering)によってどれくらい枝刈りされるかが大きく変わるということがわかったのでこれを試行錯誤しながら工夫した。まず、その手を打つことで相手の着手可能数を少なくできるようなものから探索するように変えると、劇的に速度が向上した。具体的には中盤7手、終盤16手読めるようになった。
+\subsubsection*{logistelloのopening bookの利用}
+logistelloというプログラムのopeningbookが公開されていたので変換して、クライアント起動時にハッシュテーブルに定石をロードするようにし、
+ハッシュテーブルに今の盤面のエントリがあればopening bookで採用された手のリストを取得して、ランダムに選択するようにしている。
+\subsubsection*{反復深化法}
+反復深化法は,深さkまでの探索の評価結果が低い(相手にとって高い)ものから順に深さk+1までの探索を行うということを繰り返すアルゴリズムで、Orderingの効果によってよく枝刈りができるという情報を得たので実装してみたが、上で実装したものと速度はさほどかわらないか少し遅い程度であったので残念ながらもとのバージョンに戻した。
+\subsubsection*{勝ちの読み切りの改善}
+これまで終盤の読み切りでは石差が最大になるように(もっとも圧勝できる)ようにしていたが、一つでも勝ちルートを見つけたらそれを採用するうように変更した。どうやっても負ける場合は今まで通り最も石差が小さくなるような手を選ぶようにしている(相手が読み切れていなかったり間違える可能性があるため)
+\subsubsection*{native-codeへのコンパイル}
+これまでのものはbyte-codeへコンパイルされていたのでnative-codeにコンパイルするように変更した。これによって速度がかなり上がり、中盤9手、終盤18手読めるようになった。
+\subsection*{終盤探索方法の変更}
+残り18手になれば完全に読み切れるが、残り19,20,21,22手でも短い時間で勝ちルートが見つかることがあったので、のこり19,20,21,22手のときに5000000ノードに限定して探索を行い、この制限以内に勝ちルートが見つからなかったらexceptionを投げて、中盤用の探索に切り変えるようにした。これで19-22手ですぐ見つかる勝ち筋があるときにそれを逃さないようになった。
+\subsection*{人と対戦してみた感想と考察}
+18erの佐藤さんが公開してらっしゃるAI(https://github.com/gasin/OCallo)と100戦した結果は50勝40敗10分けだった。19erの向井くんとは36勝33敗だった。
+自分のプログラムの弱点は適当な評価関数による中盤だと思う。はじめに決めた評価関数のままなのは確定石や開放度などの要素を取り入れることによる評価関数の計算量増加を嫌った結果である。
+\subsection*{時間があればしたかった改良や方針}
+nega-alphaをnega-scoutに改善しようと思っていたが10\%程度の速度改善しか見込めないとWikiで見たので後回しにしていたら期限が迫ってしまい改善できなかった。MTD(f)法や同期の何人かが実装していたdf-pn法などもおもしろそうなので実装してみたかった。
+\end{document}
+%

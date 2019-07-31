@@ -257,7 +257,7 @@ and get_optimal_negamax_last2 depth board mycolor color alpha beta =
   (*print_string "debug-------------------\n";
   print_board board;*)
   counter := !counter+1;
-  if (!counter > 6000000) then (raise Timeout)
+  if (!counter > 5000000) then (raise Timeout)
   else
   (
     let res = Hashtbl.find_opt last_table board in
@@ -453,9 +453,9 @@ let play board color =
       print_int v;
       print_string (("\n"^(string_of_move com))^"\n");
       rev_rotate_command com
-    else if (count board none) <= 21 then
+    else if (count board none) <= 22 then
       try (
-        let (v,com) = get_optimal_negamax_last2 42 bb color color (-1000) 1000 in
+        let (v,com) = get_optimal_negamax_last2 44 bb color color (-1000) 1000 in
         print_string "win! value : ";
         print_int v;
         print_string (("\n"^(string_of_move com))^"\n");

@@ -189,8 +189,8 @@ let last_table : (bitboard,(int * move)) Hashtbl.t = Hashtbl.create 10000000
 
 
 let eval_bitboard_middle (now,opp) = 
-  (((count_corner now)*10)+(pop_count (valid_move_board (now,opp))))
-    -(((count_corner opp)*10)+(pop_count (valid_move_board (opp,now))))
+  (((count_corner now)*7)+(pop_count (valid_move_board (now,opp))))
+    -(((count_corner opp)*7)+(pop_count (valid_move_board (opp,now))))
 
 let eval_bitboard_last (now,opp) = 
   ((pop_count now)-(pop_count opp))
@@ -223,15 +223,12 @@ let rec print_com_list com_list =
   | com::rest -> print_string (string_of_move com);print_string "; ";print_com_list rest
 
 let counter = ref 0
+exception Timeout
 
 let max a b =
 	if a > b then a else b
 
 let rec negamax_rec_last (value,mv) com_list depth board mycolor color alpha beta =
-  (*if !counter > 1000000 then
-    (value,mv)
-  else*)
-  (
   match com_list with 
   | [] -> (value,mv)
   | (com::rest) -> 
@@ -243,55 +240,121 @@ let rec negamax_rec_last (value,mv) com_list depth board mycolor color alpha bet
     else (
       if nval>=beta then (nval,nmove) else (negamax_rec_last (nval,nmove) rest depth board mycolor color alpha beta)
     )
-  )
+and negamax_rec_last2 (value,mv) com_list depth board mycolor color alpha beta =
+  match com_list with 
+  | [] -> (value,mv)
+  | (com::rest) -> 
+    let next = doMove_bitboard board com in
+    let (v,_) = get_optimal_negamax_last2 (depth-1) next mycolor (opposite_color color) (-beta) (-(max value alpha)) in  
+    let (nval,nmove) = if (-v)>value then (-v,com) else (value,mv) in
+    if ((nval>0) && (mycolor = color)) then
+      (nval,nmove) 
+    else (
+      if nval>=beta then (nval,nmove) else (negamax_rec_last2 (nval,nmove) rest depth board mycolor color alpha beta)
+    )
 (* eval value * move *)
+and get_optimal_negamax_last2 depth board mycolor color alpha beta =
+  (*print_string "debug-------------------\n";
+  print_board board;*)
+  counter := !counter+1;
+  if (!counter > 5000000) then (raise Timeout)
+  else
+  (
+    let res = Hashtbl.find_opt last_table board in
+    match res with
+    | Some c -> c
+    | None ->
+    (
+      if ((depth = 0) || ((count_empty board) = 0)) then
+      (
+        let (v,m) = ((eval_bitboard_last board),Pass) in
+        (*
+        (if mode = Last then 
+          (
+           print_string ("mycolor : "^(string_of_color mycolor)^"\n");
+           print_string ("turn: "^(string_of_color color)^"\n");
+           print_string "value :";
+           print_int v;
+           print_string "\n";
+           print_bitboard board mycolor color
+        ));
+        *)
+        (*(if !counter <= 1000000 then 
+          Hashtbl.add last_table board (v,m)
+        else ());*)Hashtbl.add last_table board (v,m);(v,m)
+      )
+      else
+      ( 
+        let com_list = valid_move_list (valid_move_board board) in
+        let com_list_sorted = 
+          List.sort
+          (fun s t -> ((next_valid_move_size board s) - (next_valid_move_size board t)))
+          com_list in
+        let (v,m) = (negamax_rec_last2 (-1000,Pass) com_list_sorted depth board mycolor color alpha beta) in
+        (*
+        (if mode = Last then
+          (
+           print_string ("turn: "^(string_of_color color)^"\n"); 
+           print_bitboard board mycolor color;
+           print_string "value :";
+           print_int v;
+           print_string "\n")); *)
+        
+        (*(if !counter <= 1000000 then
+          Hashtbl.add last_table board (v,m)
+        else ());*) Hashtbl.add last_table board (v,m);(v,m)
+      )
+    )
+  )
 and get_optimal_negamax_last depth board mycolor color alpha beta =
   (*print_string "debug-------------------\n";
   print_board board;*)
-  counter := !counter+1; 
-  let res = Hashtbl.find_opt last_table board in
-  match res with
-  | Some c -> c
-  | None ->
+  counter := !counter+1;
   (
-    if ((depth = 0) || ((count_empty board) = 0)) then
+    let res = Hashtbl.find_opt last_table board in
+    match res with
+    | Some c -> c
+    | None ->
     (
-      let (v,m) = ((eval_bitboard_last board),Pass) in
-      (*
-      (if mode = Last then 
-        (
-         print_string ("mycolor : "^(string_of_color mycolor)^"\n");
-         print_string ("turn: "^(string_of_color color)^"\n");
-         print_string "value :";
-         print_int v;
-         print_string "\n";
-         print_bitboard board mycolor color
-      ));
-      *)
-      (*(if !counter <= 1000000 then 
-        Hashtbl.add last_table board (v,m)
-      else ());*)Hashtbl.add last_table board (v,m);(v,m)
-    )
-    else
-    ( 
-      let com_list = valid_move_list (valid_move_board board) in
-      let com_list_sorted = 
-        List.sort
-        (fun s t -> ((next_valid_move_size board s) - (next_valid_move_size board t)))
-        com_list in
-      let (v,m) = (negamax_rec_last (-1000,Pass) com_list_sorted depth board mycolor color alpha beta) in
-      (*
-      (if mode = Last then
-        (
-         print_string ("turn: "^(string_of_color color)^"\n"); 
-         print_bitboard board mycolor color;
-         print_string "value :";
-         print_int v;
-         print_string "\n")); *)
-      
-      (*(if !counter <= 1000000 then
-        Hashtbl.add last_table board (v,m)
-      else ());*) Hashtbl.add last_table board (v,m);(v,m)
+      if ((depth = 0) || ((count_empty board) = 0)) then
+      (
+        let (v,m) = ((eval_bitboard_last board),Pass) in
+        (*
+        (if mode = Last then 
+          (
+           print_string ("mycolor : "^(string_of_color mycolor)^"\n");
+           print_string ("turn: "^(string_of_color color)^"\n");
+           print_string "value :";
+           print_int v;
+           print_string "\n";
+           print_bitboard board mycolor color
+        ));
+        *)
+        (*(if !counter <= 1000000 then 
+          Hashtbl.add last_table board (v,m)
+        else ());*)Hashtbl.add last_table board (v,m);(v,m)
+      )
+      else
+      ( 
+        let com_list = valid_move_list (valid_move_board board) in
+        let com_list_sorted = 
+          List.sort
+          (fun s t -> ((next_valid_move_size board s) - (next_valid_move_size board t)))
+          com_list in
+        let (v,m) = (negamax_rec_last (-1000,Pass) com_list_sorted depth board mycolor color alpha beta) in
+        (*
+        (if mode = Last then
+          (
+           print_string ("turn: "^(string_of_color color)^"\n"); 
+           print_bitboard board mycolor color;
+           print_string "value :";
+           print_int v;
+           print_string "\n")); *)
+        
+        (*(if !counter <= 1000000 then
+          Hashtbl.add last_table board (v,m)
+        else ());*) Hashtbl.add last_table board (v,m);(v,m)
+      )
     )
   )
 
@@ -357,7 +420,7 @@ let play board color =
   counter := 0;
   let empty = count board none in
   if empty = 60 then
-    (rotate := 0;Mv (4,3))
+    (Hashtbl.clear last_table;rotate := 0;Mv (4,3))
   else if empty = 59 then
     ((if board.(4).(3) <> none
       then (rotate := 0)
@@ -366,10 +429,11 @@ let play board color =
     else if board.(6).(5) <> none
       then (rotate := 2)
     else (rotate := 3));
+    Hashtbl.clear last_table;
     let bb = (convert_bitboard color (copy_and_rotate_board board)) in
     let com_book = Hashtbl.find_all opening_book bb in
     (if com_book = [] then
-        (let (_,com) = get_optimal_negamax_middle 6 bb color color (-1000) 1000 in
+        (let (_,com) = get_optimal_negamax_middle 9 bb color color (-1000) 1000 in
         print_string (("\n"^(string_of_move com))^"\n");
         rev_rotate_command com)
       else
@@ -382,17 +446,34 @@ let play board color =
   let bb = (convert_bitboard color (copy_and_rotate_board board)) in
   (
     if ms = [] then
-      Pass
-    else if (count board none) <= 17 then
-      let (v,com) = get_optimal_negamax_last 34 bb color color (-1000) 1000 in
+      Pass 
+    else if (count board none) <= 18 then
+      let (v,com) = get_optimal_negamax_last 36 bb color color (-1000) 1000 in
       print_string "value : ";
       print_int v;
       print_string (("\n"^(string_of_move com))^"\n");
       rev_rotate_command com
+    else if (count board none) <= 22 then
+      try (
+        let (v,com) = get_optimal_negamax_last2 44 bb color color (-1000) 1000 in
+        print_string "win! value : ";
+        print_int v;
+        print_string (("\n"^(string_of_move com))^"\n");
+        rev_rotate_command com
+      ) with
+      | Timeout -> 
+        (
+        print_string "fail!\nnumber of nodes : ";
+        print_int !counter;
+        print_string "\n";
+        counter := 0;
+        let (_,com) = get_optimal_negamax_middle 9 bb color color (-1000) 1000 in
+        print_string (("\n"^(string_of_move com))^"\n");
+        rev_rotate_command com)
     else if (count board none) <= 64 then
       let com_book = Hashtbl.find_all opening_book bb in
       (if com_book = [] then
-        (let (_,com) = get_optimal_negamax_middle 7 bb color color (-1000) 1000 in
+        (let (_,com) = get_optimal_negamax_middle 9 bb color color (-1000) 1000 in
         print_string (("\n"^(string_of_move com))^"\n");
         rev_rotate_command com)
       else
